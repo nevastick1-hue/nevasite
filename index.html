@@ -1,0 +1,3404 @@
+
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEVASTICK — FESTIVAL & MERCH</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script type="text/javascript" src="https://cdn.qtickets.tech/openapi.js"></script>
+
+<style>
+:root {
+  --bg: #fcfcf9;
+  --bg2: #eaeae5;
+  --fg: #000000;
+  --accent: #000000;
+  --muted: #eaeae5;
+  --card-bg: #ffffff;
+  --border: #000000;
+  --dark: #000000;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border-radius: 0 !important; /* Убираем скругления для бруталистского стиля */
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Space Mono', monospace;
+  overflow-x: hidden;
+  cursor: crosshair;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--fg);
+}
+
+/* NAV */
+#nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 16px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background .3s, border .3s;
+}
+#nav.scrolled {
+  background: rgba(252, 252, 249, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 3px solid var(--border);
+}
+.nav-logo {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  color: #000000;
+}
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.cart-btn {
+  background: #ffffff;
+  border: 2px solid var(--border);
+  color: var(--fg);
+  padding: 8px 16px;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .7rem;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .1s;
+  position: relative;
+  box-shadow: 3px 3px 0 #000;
+}
+.cart-btn:hover {
+  background: var(--fg);
+  color: #ffffff!important;
+  box-shadow: 1px 1px 0 #000;
+  transform: translate(2px, 2px);
+}
+#cart-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #000000;
+  color: #fff;
+  border: 1px solid #fff;
+  font-size: .65rem;
+  font-weight: 700;
+  width: 20px;
+  height: 20px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.burger {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px;
+}
+.burger span {
+  display: block;
+  width: 28px;
+  height: 3px;
+  background: var(--fg);
+  transition: all .3s;
+}
+
+/* MENU OVERLAY */
+#menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: var(--dark);
+  display: flex;
+  flex-direction: column;
+  padding: 28px;
+  transform: translateX(-100%);
+  transition: transform .4s cubic-bezier(.16, 1, .3, 1);
+}
+#menu-overlay.open {
+  transform: translateX(0);
+}
+.menu-close {
+  align-self: flex-end;
+  background: none;
+  border: none;
+  color: #f0f0f0;
+  font-size: 2rem;
+  cursor: pointer;
+  margin-bottom: 40px;
+}
+.menu-title {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .8rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #f0f0f0;
+  opacity: .5;
+  margin-bottom: 24px;
+}
+.menu-cats {
+  list-style: none;
+  flex: 1;
+}
+.menu-cats li {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: clamp(1.8rem, 6vw, 3.2rem);
+  font-weight: 900;
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: #f0f0f0;
+  opacity: .3;
+  cursor: pointer;
+  transition: opacity .1s, color .1s;
+  padding: 8px 0;
+  letter-spacing: -0.04em;
+}
+.menu-cats li:hover, .menu-cats li.active {
+  opacity: 1;
+  color: #ffffff;
+}
+.menu-footer {
+  font-size: .65rem;
+  opacity: .4;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: #f0f0f0;
+}
+
+/* HEADER / HERO */
+#site-header {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  padding: 120px 0 60px;
+}
+.header-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 24px;
+  width: 100%;
+  max-width: 950px;
+}
+.header-logo-text {
+  font-family: 'Archivo Black', sans-serif;
+  font-weight: 900;
+  font-size: clamp(3rem, 14vw, 9rem);
+  color: #000000;
+  text-transform: uppercase;
+  line-height: 0.8;
+  letter-spacing: -0.06em;
+  margin-bottom: 12px;
+}
+.header-sub {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: clamp(0.75rem, 2vw, 1.1rem);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--fg);
+  line-height: 1.1;
+  margin-top: 8px;
+  margin-bottom: 32px; /* Увеличен отступ, так как убраны сердечки */
+}
+.header-doodles {
+  font-size: clamp(1.8rem, 6vw, 3rem);
+  color: var(--fg);
+  line-height: 1;
+  margin-bottom: 32px;
+  letter-spacing: 0.15em;
+  user-select: none;
+}
+
+/* MARQUEE */
+.marquee-container {
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  background: #000000;
+  color: #ffffff;
+  padding: 16px 0;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: clamp(0.8rem, 2.5vw, 1.1rem);
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  border-top: 3px solid var(--border);
+  border-bottom: 3px solid var(--border);
+  margin-bottom: 32px;
+}
+.marquee-inner {
+  display: inline-block;
+  animation: marquee 25s linear infinite;
+}
+.marquee-inner span {
+  display: inline-block;
+  padding-right: 2rem;
+}
+@keyframes marquee {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+/* TICKETS BOX WITH SLIDESHOW */
+.tickets-box {
+  position: relative;
+  width: 100%;
+  max-width: 650px;
+  height: 280px;
+  margin: 0 auto 40px;
+  overflow: hidden;
+  border: 3px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000000;
+  box-shadow: 8px 8px 0 #000;
+}
+.tickets-slides {
+  position: absolute;
+  inset: 0;
+}
+.tickets-slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 1.5s cubic-bezier(.4, 0, .2, 1);
+}
+.tickets-slide.active {
+  opacity: 1;
+}
+.tickets-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+}
+.tickets-inner-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+.tickets-heading {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 2.2rem;
+  color: #ffffff;
+  margin-bottom: 20px;
+  letter-spacing: -0.02em;
+}
+.qtickets-button {
+  background: #ffffff;
+  border: 3px solid var(--border);
+  color: #000000;
+  font-family: 'Archivo Black', sans-serif;
+  font-weight: 900;
+  padding: 16px 36px;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+  display: inline-block;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.1s;
+  box-shadow: 4px 4px 0 #000;
+}
+.qtickets-button:hover {
+  background: #000000;
+  border-color: #ffffff;
+  color: #ffffff;
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 #fff;
+}
+.scroll-hint {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .8rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--fg);
+  animation: bounce 2s infinite;
+  margin-top: 20px;
+}
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+/* SECTION DIVIDER */
+.section-divider {
+  position: relative;
+  height: 250px;
+  overflow: hidden;
+  border-top: 3px solid var(--border);
+  border-bottom: 3px solid var(--border);
+}
+.section-divider img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(.3) grayscale(1);
+}
+.section-divider-bg {
+  width: 100%;
+  height: 100%;
+  background: var(--dark);
+}
+.section-divider-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: clamp(1.4rem, 5vw, 3.8rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  color: #ffffff;
+  padding: 0 20px;
+  text-align: center;
+}
+.section-divider-label span {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+/* PRODUCTS SECTION */
+.products-section {
+  padding: 80px 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 40px;
+  border-bottom: 3px solid var(--border);
+  padding-bottom: 16px;
+}
+.section-name {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+.section-count {
+  font-size: .75rem;
+  font-weight: bold;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 32px;
+}
+
+/* PRODUCT CARD */
+.product-card {
+  background: var(--card-bg);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  border: 3px solid var(--border);
+  box-shadow: 6px 6px 0 #000;
+  transition: transform .15s, box-shadow .15s;
+}
+.product-card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 9px 9px 0 #000;
+}
+.card-img-wrap {
+  position: relative;
+  aspect-ratio: 3/4;
+  overflow: hidden;
+  background: var(--muted);
+  border-bottom: 3px solid var(--border);
+}
+.card-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .5s cubic-bezier(.16, 1, .3, 1);
+  display: block;
+}
+.card-img-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-family: 'Archivo Black', sans-serif;
+  color: var(--fg);
+}
+.card-dots {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  pointer-events: none;
+}
+.card-dot {
+  width: 8px;
+  height: 8px;
+  border: 1px solid #000000;
+  background: rgba(255, 255, 255, 0.6);
+}
+.card-dot.active {
+  background: #000000;
+}
+.card-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #000000;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .6rem;
+  font-weight: 900;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  pointer-events: none;
+}
+.card-actions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  opacity: 0;
+  transform: translateX(10px);
+  transition: all .2s;
+}
+.product-card:hover .card-actions {
+  opacity: 1;
+  transform: translateX(0);
+}
+.card-action-btn {
+  width: 36px;
+  height: 36px;
+  background: #ffffff;
+  border: 2px solid var(--border);
+  color: var(--fg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: all .1s;
+}
+.card-action-btn:hover {
+  background: #000000;
+  color: #ffffff;
+}
+.card-action-btn.liked {
+  color: #ffffff;
+  background: #000000;
+}
+.card-body {
+  padding: 20px;
+}
+.card-cat {
+  font-size: .6rem;
+  font-weight: bold;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  opacity: .5;
+  margin-bottom: 8px;
+}
+.card-name {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1.1;
+  margin-bottom: 10px;
+  letter-spacing: -0.02em;
+}
+.card-desc {
+  font-size: .7rem;
+  opacity: .7;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+.card-sizes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.card-size-btn {
+  padding: 6px 12px;
+  background: #ffffff;
+  border: 2px solid var(--border);
+  color: var(--fg);
+  font-family: 'Space Mono', monospace;
+  font-size: .65rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .1s;
+  user-select: none;
+}
+.card-size-btn:hover:not(:disabled) {
+  background: #000000;
+  color: #ffffff;
+}
+.card-size-btn.sel {
+  background: var(--fg);
+  border-color: var(--fg);
+  color: #ffffff;
+}
+.card-size-btn:disabled {
+  opacity: .25;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+.card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.card-price {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+.card-add-btn {
+  background: #ffffff;
+  border: 2px solid var(--border);
+  color: var(--fg);
+  padding: 10px 18px;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .65rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .1s;
+  white-space: nowrap;
+  box-shadow: 3px 3px 0 #000;
+}
+.card-add-btn:hover {
+  background: var(--fg);
+  color: #ffffff;
+  box-shadow: 1px 1px 0 #000;
+  transform: translate(2px, 2px);
+}
+
+/* PRODUCT MODAL */
+#product-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: rgba(0,0,0,.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+#product-modal.open {
+  display: flex;
+}
+.pm-box {
+  background: var(--bg);
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  position: relative;
+  border: 3px solid var(--border);
+  box-shadow: 12px 12px 0 #000;
+}
+@media(max-width: 680px){
+  .pm-box { grid-template-columns: 1fr; }
+}
+.pm-gallery {
+  position: relative;
+  aspect-ratio: 3/4;
+  background: var(--muted);
+  overflow: hidden;
+  border-right: 3px solid var(--border);
+}
+@media(max-width: 680px){
+  .pm-gallery { border-right: none; border-bottom: 3px solid var(--border); }
+}
+.pm-gallery img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  cursor: zoom-in;
+}
+.pm-gallery-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 4rem;
+}
+.pm-gallery-nav {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  pointer-events: none;
+}
+.pm-nav-btn {
+  width: 40px;
+  height: 40px;
+  background: #ffffff;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  font-size: 1.5rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+.pm-thumbs {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  overflow-x: auto;
+  background: var(--bg2);
+  border-right: 3px solid var(--border);
+}
+@media(max-width: 680px){
+  .pm-thumbs { border-right: none; border-bottom: 3px solid var(--border); }
+}
+.pm-thumb {
+  width: 55px;
+  height: 70px;
+  object-fit: cover;
+  cursor: pointer;
+  opacity: .5;
+  border: 2px solid transparent;
+  transition: all .1s;
+  flex-shrink: 0;
+}
+.pm-thumb.active {
+  opacity: 1;
+  border-color: var(--border);
+}
+.pm-info {
+  padding: 40px 32px;
+  display: flex;
+  flex-direction: column;
+}
+.pm-cat {
+  font-size: .65rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  opacity: .6;
+  margin-bottom: 12px;
+  font-weight: bold;
+}
+.pm-name {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1.05;
+  margin-bottom: 16px;
+  letter-spacing: -0.04em;
+}
+.pm-price {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--fg);
+  margin-bottom: 24px;
+  letter-spacing: -0.03em;
+}
+.pm-desc {
+  font-size: .75rem;
+  line-height: 1.7;
+  opacity: .8;
+  margin-bottom: 24px;
+  flex: 1;
+}
+.pm-sizes-wrap {
+  margin-bottom: 24px;
+}
+.pm-sizes-label {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .65rem;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.pm-sizes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.size-btn {
+  padding: 8px 16px;
+  background: #ffffff;
+  border: 2px solid var(--border);
+  color: var(--fg);
+  font-family: 'Space Mono', monospace;
+  font-size: .65rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .1s;
+}
+.size-btn:hover:not(:disabled) {
+  background: #000000;
+  color: #ffffff;
+}
+.size-btn.sel {
+  background: var(--fg);
+  border-color: var(--fg);
+  color: #ffffff;
+}
+.size-btn:disabled {
+  opacity: .25;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+.pm-size-err {
+  font-size: .65rem;
+  font-weight: bold;
+  color: #ff0000;
+  margin-top: 8px;
+  margin-bottom: 12px;
+  display: none;
+}
+.pm-add-btn {
+  width: 100%;
+  padding: 18px;
+  background: #000000;
+  color: #ffffff;
+  border: 3px solid var(--border);
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .1s;
+  margin-bottom: 12px;
+  box-shadow: 4px 4px 0 #000;
+}
+.pm-add-btn:hover {
+  background: #ffffff;
+  color: #000000;
+  box-shadow: 2px 2px 0 #000;
+  transform: translate(2px, 2px);
+}
+.pm-actions {
+  display: flex;
+  gap: 12px;
+}
+.pm-action-btn {
+  flex: 1;
+  padding: 12px;
+  background: #ffffff;
+  border: 2px solid var(--border);
+  color: var(--fg);
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .65rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .1s;
+}
+.pm-action-btn:hover {
+  background: #000000;
+  color: #ffffff;
+}
+.pm-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 5;
+  width: 38px;
+  height: 38px;
+  background: #ffffff;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* CART DRAWER */
+#cart-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(420px, 100vw);
+  height: 100%;
+  background: var(--bg);
+  border-left: 3px solid var(--border);
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform .4s cubic-bezier(.16, 1, .3, 1);
+}
+#cart-drawer.open {
+  transform: translateX(0);
+}
+.cart-header {
+  padding: 28px 24px;
+  border-bottom: 3px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.cart-header h2 {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+.cart-close {
+  background: none;
+  border: none;
+  color: var(--fg);
+  font-size: 1.8rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+.cart-items {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+.cart-empty {
+  text-align: center;
+  font-size: .7rem;
+  font-weight: bold;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-top: 60px;
+}
+.cart-item {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid var(--border);
+}
+.cart-item-img {
+  width: 70px;
+  height: 90px;
+  object-fit: cover;
+  background: var(--muted);
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+}
+.cart-item-info {
+  flex: 1;
+  min-width: 0;
+}
+.cart-item-name {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+.cart-item-size {
+  font-size: .65rem;
+  font-weight: bold;
+  color: var(--fg);
+  margin-bottom: 4px;
+}
+.cart-item-price {
+  font-size: .75rem;
+  font-weight: bold;
+}
+.cart-item-qty {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+.qty-btn {
+  width: 26px;
+  height: 26px;
+  background: #ffffff;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .1s;
+  color: var(--fg);
+}
+.qty-btn:hover {
+  background: #000000;
+  color: #ffffff;
+}
+.qty-val {
+  font-size: .75rem;
+  font-weight: bold;
+  min-width: 22px;
+  text-align: center;
+}
+.cart-item-remove {
+  background: none;
+  border: none;
+  color: var(--fg);
+  opacity: .5;
+  cursor: pointer;
+  font-size: 1.2rem;
+  align-self: flex-start;
+  transition: all .1s;
+}
+.cart-item-remove:hover {
+  opacity: 1;
+  color: #000000;
+}
+.cart-footer {
+  padding: 24px;
+  border-top: 3px solid var(--border);
+  background: var(--bg2);
+}
+.cart-total {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+.checkout-btn {
+  width: 100%;
+  padding: 18px;
+  background: #000000;
+  color: #ffffff;
+  border: 3px solid var(--border);
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .1s;
+  box-shadow: 4px 4px 0 #000;
+}
+.checkout-btn:hover {
+  background: #ffffff;
+  color: #000000;
+  box-shadow: 2px 2px 0 #000;
+  transform: translate(2px, 2px);
+}
+
+/* CHECKOUT MODAL */
+#checkout-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 450;
+  background: rgba(0,0,0,.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+#checkout-modal.open {
+  display: flex;
+}
+.co-box {
+  background: var(--bg);
+  max-width: 550px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 40px;
+  position: relative;
+  border: 3px solid var(--border);
+  box-shadow: 8px 8px 0 #000;
+}
+.co-title {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+.co-step {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .7rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--fg);
+  margin: 24px 0 12px;
+}
+.co-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.co-field label {
+  font-size: .65rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  opacity: .7;
+}
+.co-input {
+  background: #ffffff;
+  border: 2px solid var(--border);
+  color: var(--fg);
+  padding: 12px 16px;
+  font-family: 'Space Mono', monospace;
+  font-size: .75rem;
+  outline: none;
+  width: 100%;
+}
+.co-input:focus {
+  border-color: #000000;
+}
+.co-promo-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.co-promo-apply {
+  padding: 12px 20px;
+  background: #000000;
+  color: #ffffff;
+  border: 2px solid var(--border);
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .7rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .1s;
+}
+.co-promo-apply:hover {
+  background: #ffffff;
+  color: #000000;
+}
+.co-promo-msg {
+  font-size: .7rem;
+  font-weight: bold;
+  min-height: 18px;
+  margin-bottom: 12px;
+}
+.co-summary {
+  background: var(--bg2);
+  border: 2px solid var(--border);
+  padding: 20px;
+  margin: 24px 0;
+  font-size: .75rem;
+  line-height: 2;
+}
+.co-summary-row {
+  display: flex;
+  justify-content: space-between;
+}
+.co-summary-total {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .95rem;
+  font-weight: 900;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 2px solid var(--border);
+}
+.co-submit {
+  width: 100%;
+  padding: 18px;
+  background: #000000;
+  color: #ffffff;
+  border: 3px solid var(--border);
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .1s;
+  box-shadow: 4px 4px 0 #000;
+}
+.co-submit:hover {
+  background: #ffffff;
+  color: #000000;
+  box-shadow: 2px 2px 0 #000;
+  transform: translate(2px, 2px);
+}
+.co-submit:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+.co-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  color: var(--fg);
+}
+
+/* MY ORDERS */
+#orders-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 350;
+  background: rgba(0,0,0,.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+#orders-panel.open {
+  display: flex;
+}
+.op-box {
+  background: var(--bg);
+  max-width: 650px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 40px;
+  position: relative;
+  border: 3px solid var(--border);
+  box-shadow: 8px 8px 0 #000;
+}
+.op-title {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.op-sub {
+  font-size: .65rem;
+  font-weight: bold;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+  opacity: .6;
+}
+.op-order {
+  padding: 20px;
+  border: 2px solid var(--border);
+  margin-bottom: 16px;
+  background: var(--card-bg);
+}
+.op-order-id {
+  font-size: .65rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+.op-order-items {
+  font-size: .75rem;
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+.op-order-total {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .9rem;
+  font-weight: 900;
+  margin-bottom: 12px;
+}
+.op-status {
+  display: inline-block;
+  padding: 4px 12px;
+  font-size: .6rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  border: 2px solid #000;
+}
+.op-status.pending { background: #ffeeba; color: #000; }
+.op-status.confirmed { background: #d1e7dd; color: #000; }
+.op-status.shipped { background: #cfe2ff; color: #000; }
+.op-status.done { background: #d4edda; color: #000; }
+.op-status.cancelled { background: #f8d7da; color: #000; }
+.op-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: #ffffff;
+  border: 2px solid var(--border);
+  color: var(--fg);
+  padding: 8px 16px;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .65rem;
+  cursor: pointer;
+  transition: all .1s;
+}
+.op-close:hover {
+  background: #000000;
+  color: #ffffff;
+}
+.op-empty {
+  font-size: .75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 40px 0;
+}
+
+/* FOOTER */
+footer {
+  padding: 80px 24px 40px;
+  border-top: 3px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  text-align: center;
+  background: var(--bg2);
+}
+.footer-logo {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+}
+.footer-logo span {
+  text-decoration: underline;
+}
+.footer-links {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.footer-link {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .75rem;
+  text-transform: uppercase;
+  transition: all .1s;
+  cursor: pointer;
+}
+.footer-link:hover {
+  text-decoration: underline;
+}
+.footer-orders-btn {
+  background: #ffffff;
+  border: 2px solid var(--border);
+  color: var(--fg);
+  padding: 12px 28px;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .7rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .1s;
+  box-shadow: 3px 3px 0 #000;
+}
+.footer-orders-btn:hover {
+  background: #000000;
+  color: #ffffff;
+  box-shadow: 1px 1px 0 #000;
+  transform: translate(2px, 2px);
+}
+.support-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #ffffff;
+  border: 2px solid var(--border);
+  color: var(--fg);
+  padding: 12px 24px;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .7rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .1s;
+  box-shadow: 3px 3px 0 #000;
+}
+.support-btn:hover {
+  background: #000000;
+  color: #ffffff;
+  box-shadow: 1px 1px 0 #000;
+  transform: translate(2px, 2px);
+}
+.support-btn svg {
+  width: 18px;
+  height: 18px;
+}
+.footer-copy {
+  font-size: .65rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  opacity: .6;
+}
+
+/* TOAST */
+#toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #000000;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  padding: 14px 28px;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .7rem;
+  text-transform: uppercase;
+  z-index: 9999;
+  opacity: 0;
+  transition: all .2s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+#toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* LOADER */
+#page-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity .4s;
+}
+#page-loader.gone {
+  opacity: 0;
+  pointer-events: none;
+}
+.loader-logo {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 2rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.05em;
+  color: var(--fg);
+}
+.loader-bar {
+  width: 100px;
+  height: 4px;
+  background: #ffffff;
+  border: 2px solid #000;
+  margin: 18px auto 0;
+  overflow: hidden;
+}
+.loader-bar-fill {
+  height: 100%;
+  background: #000000;
+  animation: load 1.2s ease-in-out infinite;
+}
+@keyframes load {
+  0% { width: 0; margin-left: 0; }
+  50% { width: 100%; margin-left: 0; }
+  100% { width: 0; margin-left: 100%; }
+}
+
+/* PASSWORD MODAL */
+#pw-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 600;
+  background: rgba(0,0,0,.9);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+#pw-modal.open {
+  display: flex;
+}
+.pw-box {
+  background: #ffffff;
+  border: 3px solid #000000;
+  padding: 40px;
+  width: min(340px, 90vw);
+  text-align: center;
+  box-shadow: 8px 8px 0 #000;
+}
+.pw-title {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  color: #000000;
+}
+.pw-sub {
+  font-size: .65rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  color: #000000;
+  opacity: .6;
+}
+.pw-input {
+  width: 100%;
+  background: #ffffff;
+  border: 2px solid #000000;
+  color: #000000;
+  padding: 12px 16px;
+  text-align: center;
+  font-family: 'Space Mono', monospace;
+  font-size: 1.3rem;
+  letter-spacing: .3em;
+  outline: none;
+  margin-bottom: 20px;
+}
+.pw-input.error {
+  border-color: #ff0000;
+  animation: shake .3s;
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+.pw-btn {
+  width: 100%;
+  padding: 14px;
+  background: #000000;
+  color: #ffffff;
+  border: 2px solid #000000;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .1s;
+}
+.pw-btn:hover {
+  background: #ffffff;
+  color: #000000;
+}
+
+/* ADMIN PANEL */
+#admin-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: #ffffff;
+  overflow-y: auto;
+  display: none;
+  color: #000000;
+}
+#admin-modal.open {
+  display: block;
+}
+.admin-inner {
+  max-width: 950px;
+  margin: 0 auto;
+  padding: 60px 24px 100px;
+}
+.admin-title {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  margin-bottom: 8px;
+}
+.admin-sub {
+  font-size: .7rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 40px;
+  opacity: .6;
+}
+.admin-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+  border-bottom: 3px solid #000000;
+}
+.admin-tab {
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #000000;
+  opacity: .5;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .7rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 12px 20px;
+  transition: all .1s;
+  margin-bottom: -3px;
+}
+.admin-tab.active {
+  opacity: 1;
+  border-bottom-color: #000000;
+}
+.admin-panel {
+  display: none;
+}
+.admin-panel.active {
+  display: block;
+}
+.admin-section-title {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .85rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #000000;
+}
+.admin-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.admin-form-row.full {
+  grid-template-columns: 1fr;
+}
+.admin-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.admin-field label {
+  font-size: .65rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  opacity: .7;
+}
+.admin-input {
+  background: #ffffff;
+  border: 2px solid #000000;
+  color: #000000;
+  padding: 12px 16px;
+  font-family: 'Space Mono', monospace;
+  font-size: .75rem;
+  outline: none;
+  width: 100%;
+}
+.admin-textarea {
+  background: #ffffff;
+  border: 2px solid #000000;
+  color: #000000;
+  padding: 12px 16px;
+  font-family: 'Space Mono', monospace;
+  font-size: .75rem;
+  outline: none;
+  width: 100%;
+  min-height: 100px;
+  resize: vertical;
+}
+.admin-select {
+  background: #ffffff;
+  border: 2px solid #000000;
+  color: #000000;
+  padding: 12px 16px;
+  font-family: 'Space Mono', monospace;
+  font-size: .75rem;
+  outline: none;
+  width: 100%;
+  cursor: pointer;
+}
+.admin-btn {
+  padding: 12px 24px;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .7rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 2px solid #000000;
+  transition: all .1s;
+}
+.admin-btn.primary {
+  background: #000000;
+  color: #ffffff;
+}
+.admin-btn.primary:hover {
+  background: #ffffff;
+  color: #000000;
+}
+.admin-btn.secondary {
+  background: #ffffff;
+  color: #000000;
+}
+.admin-btn.secondary:hover {
+  background: #000000;
+  color: #ffffff;
+}
+.admin-btn.danger {
+  background: #ffffff;
+  color: #ff0000;
+  border-color: #ff0000;
+}
+.admin-btn.danger:hover {
+  background: #ff0000;
+  color: #ffffff;
+}
+.admin-btn.sm {
+  padding: 8px 16px;
+  font-size: .6rem;
+}
+.admin-product-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border: 2px solid #000000;
+  margin-bottom: 12px;
+  background: #ffffff;
+}
+.admin-product-row img {
+  width: 45px;
+  height: 55px;
+  object-fit: cover;
+  border: 1px solid #000;
+  flex-shrink: 0;
+}
+.admin-product-info {
+  flex: 1;
+  min-width: 0;
+}
+.admin-product-name {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #000000;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.admin-product-meta {
+  font-size: .65rem;
+  font-weight: bold;
+}
+.admin-product-btns {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.upload-area {
+  border: 2px dashed #000000;
+  padding: 32px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .1s;
+  background: #ffffff;
+}
+.upload-area:hover {
+  border-color: #ff0055;
+}
+.upload-area input[type=file] {
+  display: none;
+}
+.upload-area p {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .7rem;
+  text-transform: uppercase;
+}
+.admin-photos-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+.admin-photo-thumb {
+  position: relative;
+  width: 80px;
+  height: 100px;
+  border: 2px solid #000000;
+}
+.admin-photo-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.admin-photo-del {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 22px;
+  height: 22px;
+  background: #000000;
+  color: #ffffff;
+  border: 1px solid #ffffff;
+  cursor: pointer;
+  font-size: .7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.admin-section-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 2px solid #000000;
+  margin-bottom: 10px;
+  background: #ffffff;
+}
+.admin-section-row-name {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .8rem;
+  font-weight: 900;
+  flex: 1;
+}
+.admin-order-row {
+  padding: 20px;
+  border: 2px solid #000000;
+  margin-bottom: 16px;
+  background: #ffffff;
+}
+.admin-order-id {
+  font-size: .65rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+.admin-order-info {
+  font-size: .75rem;
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+.admin-order-total {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .95rem;
+  font-weight: 900;
+  margin-bottom: 16px;
+}
+.admin-order-bottom {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.status-select {
+  background: #ffffff;
+  border: 2px solid #000000;
+  padding: 8px 12px;
+  font-family: 'Space Mono', monospace;
+  font-size: .7rem;
+  font-weight: bold;
+  cursor: pointer;
+  outline: none;
+}
+.admin-close-btn {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: #ffffff;
+  border: 2px solid #000000;
+  color: #000000;
+  padding: 10px 20px;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .7rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .1s;
+}
+.admin-close-btn:hover {
+  background: #000000;
+  color: #ffffff;
+}
+.pf-sizes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.pf-size-cell {
+  background: #ffffff;
+  border: 2px solid #000000;
+  padding: 12px;
+  position: relative;
+}
+.pf-size-label {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.pf-size-del {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 22px;
+  height: 22px;
+  background: #000000;
+  color: #ffffff;
+  border: 1px solid #ffffff;
+  cursor: pointer;
+  font-size: .7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media(max-width: 600px){
+  .admin-form-row { grid-template-columns: 1fr; }
+  .admin-inner { padding: 30px 16px; }
+}
+</style>
+</head>
+<body>
+
+<div id="page-loader">
+  <div>
+    <div class="loader-logo">NEVASTICK</div>
+    <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+  </div>
+</div>
+
+<nav id="nav">
+  <div class="nav-logo" id="nav-logo">NEVASTICK</div>
+  <div class="nav-right">
+    <button class="cart-btn" id="cart-btn">КОРЗИНА<span id="cart-count"></span></button>
+    <button class="burger" onclick="openMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div id="menu-overlay">
+  <button class="menu-close" onclick="closeMenu()">✕</button>
+  <p class="menu-title">Категории</p>
+  <ul class="menu-cats" id="menu-cats-list"><li onclick="filterAll()">Всё</li></ul>
+  <p class="menu-footer">Nevastick Festival Merch</p>
+</div>
+
+<header id="site-header">
+  <div id="header-bg"></div>
+  <div id="header-overlay"></div>
+  <div class="header-content">
+    <div id="header-logo-wrap">
+      <div class="header-logo-text">NEVASTICK</div>
+    </div>
+    <p class="header-sub" id="header-sub-text">FESTIVAL STREET-ART & URBAN CULTURE</p>
+    
+    <!-- Движущаяся лента / Marquee -->
+    <div class="marquee-container">
+      <div class="marquee-inner">
+        <span>25 АВГУСТА БРУСНИЦЫН NEVASTICK4 СТРИТ-АРТ УЛИЧНОЕ ИСКУССТВО КОММЬЮНИТИ • 25 АВГУСТА БРУСНИЦЫН NEVASTICK4 СТРИТ-АРТ УЛИЧНОЕ ИСКУССТВО КОММЬЮНИТИ • </span>
+        <span>25 АВГУСТА БРУСНИЦЫН NEVASTICK4 СТРИТ-АРТ УЛИЧНОЕ ИСКУССТВО КОММЬЮНИТИ • 25 АВГУСТА БРУСНИЦЫН NEVASTICK4 СТРИТ-АРТ УЛИЧНОЕ ИСКУССТВО КОММЬЮНИТИ • </span>
+      </div>
+    </div>
+
+    <!-- Блок билетов со слайд-шоу -->
+    <div class="tickets-box" id="tickets-box">
+      <div class="tickets-slides" id="tickets-slides"></div>
+      <div class="tickets-overlay"></div>
+      <div class="tickets-inner-content">
+        <p class="tickets-heading">БИЛЕТЫ</p>
+        <a href="https://qtickets.ru/event/250610?base_color=252525" class="qtickets-button">Купить билеты</a>
+      </div>
+    </div>
+
+    <p class="scroll-hint">↓ МЕРЧ</p>
+  </div>
+</header>
+
+<main id="main-content"></main>
+
+<footer>
+  <div class="footer-logo">NEVA<span>STICK</span></div>
+  <div class="footer-links">
+    <a href="https://t.me/nevasticker" target="_blank" class="footer-link">Telegram</a>
+  </div>
+  <button class="footer-orders-btn" onclick="openOrdersPanel()">Мои заказы</button>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:6px;font-size:.65rem;font-weight:bold;text-transform:uppercase;line-height:1.7">
+    <span>Приказюк Василий Анатольевич</span>
+    <span>ИНН 781697699200</span>
+  </div>
+  <button class="support-btn" id="support-btn">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.96 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+    Поддержка
+  </button>
+  <p class="footer-copy">© 2026 Nevastick Festival. Все права защищены.</p>
+</footer>
+
+<div id="toast"></div>
+
+<!-- PRODUCT MODAL -->
+<div id="product-modal">
+  <div class="pm-box" id="pm-box">
+    <button class="pm-close" onclick="closePM()">✕</button>
+    <div>
+      <div class="pm-gallery" id="pm-gallery">
+        <div class="pm-badge" id="pm-badge" style="position:absolute; top:12px; left:12px; background:#000000; border:2px solid #fff; color:#fff; font-family:'Archivo Black', sans-serif; font-size:.6rem; font-weight:700; text-transform:uppercase; padding:4px 10px; z-index:3; display:none;"></div>
+        <div class="pm-gallery-placeholder" id="pm-placeholder">N</div>
+        <img id="pm-main-img" style="display:none" src="" alt="">
+        <div class="pm-gallery-nav" id="pm-nav" style="display:none">
+          <button class="pm-nav-btn" onclick="pmNav(-1)">‹</button>
+          <button class="pm-nav-btn" onclick="pmNav(1)">›</button>
+        </div>
+      </div>
+      <div class="pm-thumbs" id="pm-thumbs"></div>
+    </div>
+    <div class="pm-info">
+      <div class="pm-cat" id="pm-cat"></div>
+      <div class="pm-name" id="pm-name"></div>
+      <div class="pm-price" id="pm-price"></div>
+      <div class="pm-desc" id="pm-desc"></div>
+      <div class="pm-sizes-wrap" id="pm-sizes-wrap" style="display:none">
+        <div class="pm-sizes-label">Выберите размер</div>
+        <div class="pm-sizes" id="pm-sizes"></div>
+        <div class="pm-size-err" id="pm-size-err">Выберите размер</div>
+      </div>
+      <button class="pm-add-btn" id="pm-add-btn">В корзину</button>
+      <div class="pm-actions">
+        <button class="pm-action-btn" id="pm-like-btn">♡ Лайк</button>
+        <button class="pm-action-btn" id="pm-share-btn">↗ Поделиться</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FULLSCREEN LIGHTBOX ZOOM MODAL -->
+<div id="zoom-modal" style="position:fixed; inset:0; z-index:600; background:rgba(0,0,0,0.95); display:none; align-items:center; justify-content:center; cursor:zoom-out;">
+  <img id="zoom-img" style="max-width:95vw; max-height:95vh; object-fit:contain; border: 3px solid #fff;" src="" alt="Детальный просмотр">
+  <button style="position:absolute; top:20px; right:24px; background:none; border:none; color:#fff; font-size:2rem; cursor:pointer;">✕</button>
+</div>
+
+<!-- CART -->
+<div id="cart-drawer">
+  <div class="cart-header">
+    <h2>Корзина</h2>
+    <button class="cart-close" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cart-items-list"></div>
+  <div class="cart-footer" id="cart-footer" style="display:none">
+    <div class="cart-total"><span>Итого</span><span id="cart-total-price"></span></div>
+    <button class="checkout-btn" onclick="openCheckout()">Оформить заказ</button>
+  </div>
+</div>
+
+<!-- CHECKOUT -->
+<div id="checkout-modal">
+  <div class="co-box">
+    <button class="co-close" onclick="closeCheckout()">✕</button>
+    <div class="co-title">Оформление заказа</div>
+    <p class="co-step">1 — Контактные данные</p>
+    <div class="co-field"><label>Имя *</label><input class="co-input" id="co-name" placeholder="Иван Иванов"></div>
+    <div class="co-field"><label>Telegram / Телефон *</label><input class="co-input" id="co-contact" placeholder="@username или +7..."></div>
+    <p class="co-step">2 — Доставка СДЭК (пункт выдачи)</p>
+    <div class="co-field"><label>Город</label><input class="co-input" id="co-city" placeholder="Санкт-Петербург"></div>
+    <div class="co-field"><label>Адрес ПВЗ СДЭК</label><input class="co-input" id="co-address" placeholder="Найдите ближайший ПВЗ на cdek.ru"></div>
+    <div class="co-field"><label>Индекс</label><input class="co-input" id="co-zip" placeholder="190000"></div>
+    <p class="co-step">3 — Промокод</p>
+    <div class="co-promo-row">
+      <input class="co-input" id="co-promo" placeholder="Введите промокод" style="flex:1">
+      <button class="co-promo-apply" onclick="applyPromo()">Применить</button>
+    </div>
+    <div class="co-promo-msg" id="co-promo-msg"></div>
+    <p class="co-step">4 — Комментарий</p>
+    <div class="co-field"><textarea class="co-input" id="co-comment" style="min-height:60px;resize:vertical" placeholder="Пожелания, уточнения..."></textarea></div>
+    <div class="co-summary" id="co-summary"></div>
+    <button class="co-submit" id="co-submit" onclick="submitOrder()">Подтвердить заказ →</button>
+  </div>
+</div>
+
+<!-- MY ORDERS -->
+<div id="orders-panel">
+  <div class="op-box">
+    <button class="op-close" onclick="closeOrdersPanel()">✕ Закрыть</button>
+    <div class="op-title">Мои заказы</div>
+    <p class="op-sub">История с этого устройства</p>
+    <div id="orders-list-client"></div>
+  </div>
+</div>
+
+<!-- PASSWORD -->
+<div id="pw-modal">
+  <div class="pw-box">
+    <div class="pw-title">Admin Access</div>
+    <p class="pw-sub">Введите пароль</p>
+    <input class="pw-input" id="pw-input" type="password" maxlength="20" placeholder="····" onkeydown="if(event.key==='Enter')checkPw()">
+    <button class="pw-btn" onclick="checkPw()">Войти</button>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="admin-modal">
+  <div class="admin-inner" style="position:relative">
+    <button class="admin-close-btn" onclick="closeAdmin()">✕ Закрыть</button>
+    <div class="admin-title">Admin Panel</div>
+    <p class="admin-sub">Nevastick Merch Store</p>
+    <div class="admin-tabs">
+      <button class="admin-tab active" data-tab="products" onclick="switchTab('products')">Товары</button>
+      <button class="admin-tab" data-tab="sections" onclick="switchTab('sections')">Разделы</button>
+      <button class="admin-tab" data-tab="orders" onclick="switchTab('orders')">Заказы <span id="admin-orders-badge" style="display:none;background:#000;color:#fff;border:1px solid #fff;font-size:.55rem;padding:1px 6px;margin-left:4px"></span></button>
+      <button class="admin-tab" data-tab="promos" onclick="switchTab('promos')">Промокоды</button>
+      <button class="admin-tab" data-tab="design" onclick="switchTab('design')">Дизайн</button>
+    </div>
+
+    <!-- PRODUCTS TAB -->
+    <div class="admin-panel active" id="tab-products">
+      <p class="admin-section-title">Список товаров</p>
+      <div id="admin-products-list"></div>
+      <button class="admin-btn primary" onclick="openProductForm(null)" style="margin-bottom:32px">+ Добавить товар</button>
+      <div id="product-form" style="display:none;padding-top:28px;border-top:3px solid #000">
+        <p class="admin-section-title" id="pf-title">Новый товар</p>
+        <div class="admin-form-row">
+          <div class="admin-field"><label>Название</label><input class="admin-input" id="pf-name" placeholder="NEVASTICK TEE BLACK"></div>
+          <div class="admin-field"><label>Цена (₽)</label><input class="admin-input" id="pf-price" type="number" placeholder="2500"></div>
+        </div>
+        <div class="admin-form-row">
+          <div class="admin-field"><label>Категория</label><input class="admin-input" id="pf-cat" placeholder="Футболка"></div>
+          <div class="admin-field"><label>Раздел</label><select class="admin-select" id="pf-section"><option value="">— Без раздела —</option></select></div>
+        </div>
+        <div class="admin-form-row full">
+          <div class="admin-field"><label>Описание</label><textarea class="admin-textarea" id="pf-desc" placeholder="Прямая печать, 180г/м..."></textarea></div>
+        </div>
+        <div class="admin-form-row">
+          <div class="admin-field"><label>Бейдж (NEW, HIT...)</label><input class="admin-input" id="pf-badge" placeholder="NEW"></div>
+        </div>
+        <div class="admin-form-row full">
+          <div class="admin-field">
+            <label>Размеры и количество</label>
+            <div class="pf-sizes-grid" id="pf-sizes-grid"></div>
+            <div style="display:flex;gap:8px;margin-top:4px">
+              <input class="admin-input" id="pf-new-size" placeholder="XL" style="flex:1;text-transform:uppercase">
+              <button class="admin-btn secondary sm" onclick="pfAddSize()">+ Размер</button>
+            </div>
+          </div>
+        </div>
+        <div class="admin-form-row full">
+          <div class="admin-field">
+            <label>Фотографии (можно несколько)</label>
+            <div class="upload-area" onclick="document.getElementById('pf-img-input').click()">
+              <input type="file" id="pf-img-input" accept="image/*" multiple onchange="pfAddImages(this)">
+              <p>Нажмите для загрузки</p>
+            </div>
+            <div class="admin-photos-grid" id="pf-photos-grid"></div>
+          </div>
+        </div>
+        <input type="hidden" id="pf-edit-id">
+        <div style="display:flex;gap:12px;margin-top:20px">
+          <button class="admin-btn primary" onclick="saveProduct()">Сохранить</button>
+          <button class="admin-btn secondary" onclick="cancelProductForm()">Отмена</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTIONS TAB -->
+    <div class="admin-panel" id="tab-sections">
+      <p class="admin-section-title">Разделы сайта</p>
+      <div id="admin-sections-list"></div>
+      <div style="padding:20px;background:#ffffff;border:2px solid #000;margin-bottom:24px">
+        <p class="admin-section-title" style="margin-top:0">Новый раздел</p>
+        <div class="admin-form-row">
+          <div class="admin-field"><label>Название</label><input class="admin-input" id="sec-name" placeholder="Новинки"></div>
+          <div class="admin-field"><label>Порядок</label><input class="admin-input" id="sec-order" type="number" placeholder="1"></div>
+        </div>
+        <div class="admin-form-row full">
+          <div class="admin-field">
+            <label>Разделительное изображение</label>
+            <div class="upload-area" onclick="document.getElementById('sec-img-input').click()">
+              <input type="file" id="sec-img-input" accept="image/*" onchange="previewImg(this,'sec-img-prev','sec-img-data')">
+              <p>Нажмите для загрузки</p>
+              <img id="sec-img-prev" style="max-width:120px;max-height:80px;margin:10px auto 0;display:none;object-fit:cover;border:1px solid #000">
+            </div>
+          </div>
+        </div>
+        <input type="hidden" id="sec-img-data">
+        <button class="admin-btn primary" onclick="addSection()">Добавить раздел</button>
+      </div>
+    </div>
+
+    <!-- ORDERS TAB -->
+    <div class="admin-panel" id="tab-orders">
+      <p class="admin-section-title">Заказы покупателей</p>
+      <div id="admin-orders-list"></div>
+    </div>
+
+    <!-- PROMOS TAB -->
+    <div class="admin-panel" id="tab-promos">
+      <p class="admin-section-title">Промокоды</p>
+      <div id="admin-promos-list"></div>
+      <div style="padding:20px;background:#ffffff;border:2px solid #000;margin-top:12px">
+        <p class="admin-section-title" style="margin-top:0">Создать промокод</p>
+        <div class="admin-form-row">
+          <div class="admin-field"><label>Код</label><input class="admin-input" id="promo-code" placeholder="FEST2026" style="text-transform:uppercase"></div>
+          <div class="admin-field"><label>Скидка (%)</label><input class="admin-input" id="promo-discount" type="number" min="1" max="100" placeholder="15"></div>
+        </div>
+        <button class="admin-btn primary" onclick="addPromo()">Добавить промокод</button>
+      </div>
+    </div>
+
+    <!-- DESIGN TAB -->
+    <div class="admin-panel" id="tab-design">
+      <!-- Настройки режима Покупка через текст -->
+      <p class="admin-section-title">Режим приема заказов</p>
+      <div class="admin-field" style="flex-direction:row; align-items:center; gap:12px; margin-bottom:24px;">
+        <input type="checkbox" id="design-text-checkout" style="width:20px; height:20px; cursor:pointer;">
+        <label for="design-text-checkout" style="cursor:pointer; font-size:0.75rem; font-weight:bold; color:#000;">Включить режим "Покупка через текст" (технические работы)</label>
+      </div>
+
+      <p class="admin-section-title">Подзаголовок шапки</p>
+      <div class="admin-form-row full" style="margin-bottom:8px">
+        <div class="admin-field"><label>Текст под логотипом</label>
+          <input class="admin-input" id="design-sub" placeholder="FESTIVAL STREET-ART & URBAN CULTURE">
+        </div>
+      </div>
+      <div style="margin-bottom:32px"><button class="admin-btn primary" onclick="saveDesignSub()">Сохранить</button></div>
+
+      <p class="admin-section-title">Фотографии фона билетов</p>
+      <div class="admin-form-row full">
+        <div class="admin-field">
+          <div class="upload-area" onclick="document.getElementById('ticket-bgs-input').click()">
+            <input type="file" id="ticket-bgs-input" accept="image/*" multiple onchange="adminAddTicketBg(this)">
+            <p>Нажмите для загрузки фото в слайд-шоу</p>
+          </div>
+          <div class="admin-photos-grid" id="admin-ticket-bgs-grid"></div>
+        </div>
+      </div>
+
+      <p class="admin-section-title">Фон шапки</p>
+      <div class="admin-form-row full">
+        <div class="admin-field">
+          <div class="upload-area" onclick="document.getElementById('hdr-input').click()">
+            <input type="file" id="hdr-input" accept="image/*" onchange="previewImg(this,'hdr-prev','hdr-data')">
+            <p>Загрузить фоновое изображение</p>
+            <img id="hdr-prev" style="max-width:200px;max-height:120px;margin:10px auto 0;display:none;object-fit:cover;border:1px solid #000">
+          </div>
+        </div>
+      </div>
+      <input type="hidden" id="hdr-data">
+      <div style="margin-bottom:32px"><button class="admin-btn primary" onclick="saveHeader()">Сохранить фон</button></div>
+
+      <div style="margin-top:24px; border-top:2px solid #000; padding-top:24px;">
+        <button class="admin-btn primary" onclick="saveDesignSettings()">Сохранить настройки оформления и режима заказа</button>
+      </div>
+
+      <p class="admin-section-title" style="margin-top:40px">Опасная зона</p>
+      <button class="admin-btn danger" onclick="resetAll()">Сбросить все данные</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// SUPABASE CONFIG
+// ═══════════════════════════════════════════
+const SB_URL = 'https://ijbftdcnbpbqpddqrnuh.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqYmZ0ZGNuYnBicXBkZHFybnVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMzI0NDUsImV4cCI6MjA5NjYwODQ0NX0.vnMU9h7iCijzdAMJ6rq4j_6klfxvihAfpp3G3Qd4SkQ';
+
+async function sbFetch(path, opts={}){
+  const r = await fetch(SB_URL+'/rest/v1/'+path, {
+    headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY,
+      'Content-Type':'application/json', Prefer:'return=representation', ...opts.headers },
+    ...opts
+  });
+  if(!r.ok){ const t=await r.text(); throw new Error(t); }
+  const txt = await r.text();
+  return txt ? JSON.parse(txt) : null;
+}
+
+async function sbGet(table, query=''){
+  return sbFetch(table+'?'+query);
+}
+async function sbInsert(table, data){
+  return sbFetch(table, { method:'POST', body:JSON.stringify(data) });
+}
+async function sbUpdate(table, filter, data){
+  return sbFetch(table+'?'+filter, { method:'PATCH', body:JSON.stringify(data) });
+}
+async function sbDelete(table, filter){
+  return sbFetch(table+'?'+filter, { method:'DELETE' });
+}
+async function sbUpsert(table, data){
+  return sbFetch(table, { method:'POST', body:JSON.stringify(data),
+    headers:{ Prefer:'resolution=merge-duplicates,return=representation',
+      apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' } });
+}
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let products = [];
+let sections = [];
+let orders = [];
+let promos = [];
+let settings = {};
+let likes = {};
+let activeFilter = null;
+let pmId = null, pmPhotos = [], pmPhotoIdx = 0;
+let cart = []; // [{cartKey, id, size, qty}]
+let activePromo = null;
+
+function loadCart(){
+  try{ cart = JSON.parse(localStorage.getItem('neva_cart')||'[]'); }
+  catch{ cart=[]; }
+  cart = cart.map(i=>({...i, cartKey: i.cartKey||(i.size?i.id+'__'+i.size:i.id)}));
+}
+function saveCart(){ localStorage.setItem('neva_cart', JSON.stringify(cart)); }
+
+function loadLikes(){
+  try{ likes = JSON.parse(localStorage.getItem('neva_likes')||'{}'); }
+  catch{ likes={}; }
+}
+function saveLikes(){ localStorage.setItem('neva_likes', JSON.stringify(likes)); }
+
+async function ensureTables(){
+  try { products = await sbGet('products','order=created_at.asc') || []; } catch{ products=[]; }
+  try { sections = await sbGet('sections','order=sort_order.asc') || []; } catch{ sections=[]; }
+  try { orders = await sbGet('orders','order=created_at.desc') || []; } catch{ orders=[]; }
+  try { promos = await sbGet('promos','order=created_at.asc') || []; } catch{ promos=[]; }
+  try {
+    const rows = await sbGet('settings','select=key,value') || [];
+    settings = {};
+    rows.forEach(r=>settings[r.key]=r.value);
+  } catch{ settings={}; }
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+async function init(){
+  try {
+    loadCart(); 
+    loadLikes();
+    await ensureTables();
+    applySettings();
+    renderSite();
+    updateCartUI();
+    updateOrdersBadge();
+  } catch (e) {
+    console.error("Initialization error:", e);
+  } finally {
+    const loader = document.getElementById('page-loader');
+    if (loader) {
+      loader.classList.add('gone');
+    }
+  }
+}
+
+function getSetting(key, def=''){
+  return (settings[key] !== undefined && settings[key] !== null) ? settings[key] : def;
+}
+async function setSetting(key, value){
+  settings[key] = value;
+  try { await sbUpsert('settings', {key, value}); } catch(e){ console.warn('settings save:', e); }
+}
+
+function applySettings(){
+  const hdr = document.getElementById('site-header');
+  const hdrBg = document.getElementById('header-bg');
+  const bgUrl = getSetting('header_bg') || 'input_file_0.jpeg'; // по умолчанию
+  
+  if(bgUrl){ hdrBg.style.backgroundImage=`url(${bgUrl})`; }
+  else { hdrBg.style.backgroundImage='none'; }
+
+  const wrap = document.getElementById('header-logo-wrap');
+  wrap.innerHTML = `<div class="header-logo-text">NEVASTICK</div>`;
+
+  const sub = getSetting('header_sub','FESTIVAL STREET-ART & URBAN CULTURE');
+  document.getElementById('header-sub-text').textContent = sub;
+}
+
+// ═══════════════════════════════════════════
+// TICKET SLIDESHOW
+// ═══════════════════════════════════════════
+let activeSlideIdx = 0;
+let slideTimer = null;
+
+function startTicketSlideshow() {
+  const container = document.getElementById('tickets-slides');
+  if(!container) return;
+  container.innerHTML = '';
+  
+  let bgs = [];
+  try {
+    const stored = getSetting('ticket_bgs');
+    if(stored) bgs = JSON.parse(stored);
+  } catch(e) { console.warn(e); }
+  
+  if(!bgs || !bgs.length) {
+    bgs = [
+      'input_file_0.jpeg',
+      'input_file_1.jpeg',
+      'input_file_2.jpeg',
+      'input_file_3.jpeg',
+      'input_file_4.jpeg',
+      'input_file_6.jpeg',
+      'input_file_7.jpeg',
+      'input_file_9.jpeg',
+      'input_file_10.jpeg',
+      'input_file_11.jpeg'
+    ];
+  }
+  
+  bgs.forEach((img, idx) => {
+    const div = document.createElement('div');
+    div.className = 'tickets-slide' + (idx === 0 ? ' active' : '');
+    div.style.backgroundImage = `url(${img})`;
+    container.appendChild(div);
+  });
+  
+  clearInterval(slideTimer);
+  if(bgs.length > 1) {
+    activeSlideIdx = 0;
+    slideTimer = setInterval(() => {
+      const slides = container.querySelectorAll('.tickets-slide');
+      if(!slides.length) return;
+      slides[activeSlideIdx].classList.remove('active');
+      activeSlideIdx = (activeSlideIdx + 1) % slides.length;
+      slides[activeSlideIdx].classList.add('active');
+    }, 3000);
+  }
+}
+
+// ═══════════════════════════════════════════
+// RENDER SITE
+// ═══════════════════════════════════════════
+function renderSite(){
+  applySettings();
+  startTicketSlideshow();
+  
+  const cats = [...new Set(products.map(p=>p.cat).filter(Boolean))];
+  const menuList = document.getElementById('menu-cats-list');
+  menuList.innerHTML = `<li onclick="filterAll()">Всё</li>`;
+  cats.forEach(c=>{
+    const li = document.createElement('li');
+    li.textContent = c;
+    li.onclick = ()=>filterCat(c);
+    if(activeFilter===c) li.classList.add('active');
+    menuList.appendChild(li);
+  });
+
+  const main = document.getElementById('main-content');
+  main.innerHTML = '';
+
+  const sorted = [...sections].sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
+  const assignedIds = new Set();
+  sorted.forEach(s=>products.filter(p=>p.section_id===s.id).forEach(p=>assignedIds.add(p.id)));
+  const unassigned = products.filter(p=>!assignedIds.has(p.id));
+
+  const fil = p => !activeFilter || p.cat===activeFilter;
+
+  if(unassigned.filter(fil).length){
+    main.appendChild(buildSection('Все товары', unassigned.filter(fil)));
+  }
+  sorted.forEach(s=>{
+    const prods = products.filter(p=>p.section_id===s.id).filter(fil);
+    const div = document.createElement('div');
+    div.className = 'section-divider';
+    const label = formatLabel(s.name);
+    if(s.img_url){ div.innerHTML=`<img src="${s.img_url}" alt="${s.name}"><div class="section-divider-label">${label}</div>`; }
+    else { div.innerHTML=`<div class="section-divider-bg"></div><div class="section-divider-label">${label}</div>`; }
+    main.appendChild(div);
+    if(prods.length) main.appendChild(buildSection(s.name, prods));
+  });
+}
+
+function formatLabel(name){
+  const w = name.split(' ');
+  return w.map((x,i)=>i===0?`<span>${x.toUpperCase()}</span>`:x.toUpperCase()).join(' ');
+}
+
+// ═══════════════════════════════════════════
+// CARD
+// ═══════════════════════════════════════════
+function buildSection(name, prods){
+  const wrap = document.createElement('div');
+  wrap.className = 'products-section';
+  wrap.innerHTML = `<div class="section-header"><span class="section-name">${name}</span><span class="section-count">${prods.length} позиций</span></div><div class="products-grid" id="grid-${name.replace(/\s/g,'_')}"></div>`;
+  const grid = wrap.querySelector('.products-grid');
+  prods.forEach(p=>grid.appendChild(buildCard(p)));
+  return wrap;
+}
+
+function buildCard(p){
+  const imgs = p.imgs || [];
+  const sizes = p.sizes || {};
+  const sizeKeys = Object.keys(sizes);
+  const hasSizes = sizeKeys.length > 0;
+  const liked = !!likes[p.id];
+
+  const card = document.createElement('div');
+  card.className = 'product-card';
+  card.dataset.pid = p.id;
+
+  let imgHtml = '';
+  if(imgs.length){
+    imgHtml = `<img src="${imgs[0]}" alt="${p.name}" data-card-img="${p.id}" loading="lazy" decoding="async">`;
+    if(imgs.length>1){
+      imgHtml += `<div class="card-dots">${imgs.map((_,i)=>`<div class="card-dot${i===0?' active':''}"></div>`).join('')}</div>`;
+    }
+  } else {
+    imgHtml = `<div class="card-img-placeholder">N</div>`;
+  }
+
+  let sizesHtml = '';
+  if(hasSizes){
+    sizesHtml = '<div class="card-sizes">' + sizeKeys.map(sz=>{
+      const avail = (sizes[sz]||0)>0;
+      return `<button class="card-size-btn" data-sz="${sz}"${avail?'':' disabled'}>${sz}</button>`;
+    }).join('') + '</div>';
+  }
+
+  card.innerHTML = `
+    <div class="card-img-wrap">
+      ${imgHtml}
+      ${p.badge?`<div class="card-badge">${p.badge}</div>`:''}
+      <div class="card-actions">
+        <button class="card-action-btn${liked?' liked':''}" data-action="like" title="Лайк">${liked?'♥':'♡'}</button>
+        <button class="card-action-btn" data-action="share" title="Поделиться">↗</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-cat">${p.cat||''}</div>
+      <div class="card-name">${p.name}</div>
+      ${p.desc?`<div class="card-desc">${p.desc}</div>`:''}
+      ${sizesHtml}
+      <div class="card-bottom">
+        <div class="card-price">${Number(p.price).toLocaleString('ru-RU')} ₽</div>
+        <button class="card-add-btn" data-action="add">В корзину</button>
+      </div>
+    </div>`;
+
+  let imgIdx = 0;
+
+  card.addEventListener('click', e=>{
+    const action = e.target.dataset.action || e.target.closest('[data-action]')?.dataset.action;
+    const szBtn = e.target.closest('.card-size-btn');
+
+    if(szBtn && !szBtn.disabled){
+      e.stopPropagation();
+      card.querySelectorAll('.card-size-btn').forEach(b=>b.classList.remove('sel'));
+      szBtn.classList.add('sel');
+      return;
+    }
+    if(action === 'add'){
+      e.stopPropagation();
+      if(hasSizes){
+        const sel = card.querySelector('.card-size-btn.sel');
+        if(!sel){ showToast('Выберите размер'); return; }
+        addToCart(p.id, sel.dataset.sz);
+      } else {
+        addToCart(p.id, null);
+      }
+      return;
+    }
+    if(action === 'like'){ e.stopPropagation(); doLike(p.id); return; }
+    if(action === 'share'){ e.stopPropagation(); doShare(p.id); return; }
+    if(e.target.closest('.card-actions')){ e.stopPropagation(); return; }
+    const dot = e.target.closest('.card-dot');
+    if(dot){
+      e.stopPropagation();
+      const dots = [...card.querySelectorAll('.card-dot')];
+      imgIdx = dots.indexOf(dot);
+      dots.forEach((d,i)=>d.classList.toggle('active',i===imgIdx));
+      const img = card.querySelector(`[data-card-img="${p.id}"]`);
+      if(img && imgs[imgIdx]) img.src = imgs[imgIdx];
+      return;
+    }
+    openPM(p.id);
+  });
+
+  return card;
+}
+
+// ═══════════════════════════════════════════
+// CART
+// ═══════════════════════════════════════════
+function addToCart(id, size){
+  const p = products.find(x=>x.id===id);
+  if(!p){ showToast('Товар не найден'); return; }
+  const cartKey = size ? id+'__'+size : id;
+  const ex = cart.find(i=>i.cartKey===cartKey);
+  if(ex){ ex.qty = (ex.qty||1)+1; }
+  else { cart.push({cartKey, id, size:size||null, qty:1}); }
+  saveCart(); updateCartUI();
+  showToast(size ? `${p.name} / ${size} — добавлено` : `${p.name} — добавлено`);
+}
+
+function changeQty(cartKey, delta){
+  const item = cart.find(i=>i.cartKey===cartKey);
+  if(!item) return;
+  const nq = (item.qty||1)+delta;
+  if(nq<=0){ removeFromCart(cartKey); return; }
+  item.qty = nq;
+  saveCart(); updateCartUI();
+}
+
+function removeFromCart(cartKey){
+  cart = cart.filter(i=>i.cartKey!==cartKey);
+  saveCart(); updateCartUI();
+}
+
+function updateCartUI(){
+  const count = cart.reduce((s,i)=>s+(i.qty||1),0);
+  const countEl = document.getElementById('cart-count');
+  countEl.textContent = count||'';
+  countEl.style.display = count>0 ? 'flex' : 'none';
+
+  const list = document.getElementById('cart-items-list');
+  const footer = document.getElementById('cart-footer');
+
+  if(!cart.length){
+    list.innerHTML = '<p class="cart-empty">Корзина пуста</p>';
+    footer.style.display = 'none';
+    return;
+  }
+  footer.style.display = 'block';
+  let total = 0;
+  list.innerHTML = '';
+  cart.forEach(item=>{
+    const p = products.find(x=>x.id===item.id);
+    if(!p) return;
+    const lineTotal = p.price*(item.qty||1);
+    total += lineTotal;
+    const el = document.createElement('div');
+    el.className = 'cart-item';
+    const thumb = (p.imgs&&p.imgs[0])
+      ? `<img class="cart-item-img" src="${p.imgs[0]}" alt="${p.name}">`
+      : `<div class="cart-item-img" style="display:flex;align-items:center;justify-content:center;opacity:.15;font-size:1.4rem">N</div>`;
+    const safeKey = encodeURIComponent(item.cartKey);
+    el.innerHTML = `${thumb}
+      <div class="cart-item-info">
+        <div class="cart-item-name">${p.name}</div>
+        ${item.size?`<div class="cart-item-size">Размер: ${item.size}</div>`:''}
+        <div class="cart-item-price">${p.price.toLocaleString('ru-RU')} ₽</div>
+        <div class="cart-item-qty">
+          <button class="qty-btn" data-ck="${safeKey}" data-delta="-1">−</button>
+          <span class="qty-val">${item.qty||1}</span>
+          <button class="qty-btn" data-ck="${safeKey}" data-delta="1">+</button>
+        </div>
+      </div>
+      <button class="cart-item-remove" data-ck="${safeKey}">✕</button>`;
+    list.appendChild(el);
+  });
+  document.getElementById('cart-total-price').textContent = total.toLocaleString('ru-RU')+' ₽';
+
+  list.onclick = e=>{
+    const qb = e.target.closest('.qty-btn');
+    if(qb){ changeQty(decodeURIComponent(qb.dataset.ck), parseInt(qb.dataset.delta)); return; }
+    const rb = e.target.closest('.cart-item-remove');
+    if(rb){ removeFromCart(decodeURIComponent(rb.dataset.ck)); }
+  };
+}
+
+function toggleCart(){
+  document.getElementById('cart-drawer').classList.toggle('open');
+}
+document.getElementById('cart-btn').onclick = toggleCart;
+
+// ═══════════════════════════════════════════
+// PRODUCT MODAL (DETAILED OPEN CARD)
+// ═══════════════════════════════════════════
+function openPM(id){
+  const p = products.find(x=>x.id===id);
+  if(!p) return;
+  pmId = id; pmPhotos = p.imgs||[]; pmPhotoIdx=0;
+
+  document.getElementById('pm-cat').textContent = p.cat||'';
+  document.getElementById('pm-name').textContent = p.name;
+  document.getElementById('pm-price').textContent = Number(p.price).toLocaleString('ru-RU')+' ₽';
+  document.getElementById('pm-desc').textContent = p.desc||'';
+
+  const badgeEl = document.getElementById('pm-badge');
+  if(p.badge) {
+    badgeEl.textContent = p.badge;
+    badgeEl.style.display = 'block';
+  } else {
+    badgeEl.style.display = 'none';
+  }
+
+  updatePMGallery();
+
+  const thumbs = document.getElementById('pm-thumbs');
+  thumbs.innerHTML = '';
+  if(pmPhotos.length>1){
+    pmPhotos.forEach((img,i)=>{
+      const t = document.createElement('img');
+      t.src=img; t.className='pm-thumb'+(i===0?' active':'');
+      t.onclick=()=>{ pmPhotoIdx=i; updatePMGallery(); };
+      thumbs.appendChild(t);
+    });
+  }
+
+  const sizes = p.sizes||{};
+  const sizeKeys = Object.keys(sizes);
+  const wrap = document.getElementById('pm-sizes-wrap');
+  const cont = document.getElementById('pm-sizes');
+  document.getElementById('pm-size-err').style.display='none';
+  if(sizeKeys.length){
+    wrap.style.display='block';
+    cont.innerHTML = sizeKeys.map(sz=>{
+      const avail = (sizes[sz]||0)>0;
+      const qty = sizes[sz]||0;
+      return `<button class="size-btn"${avail?'':' disabled'} data-pmsize="${sz}" data-qty="${qty}">${sz} ${avail ? `(${qty} шт)` : '(нет)'}</button>`;
+    }).join('');
+    cont.querySelectorAll('.size-btn:not(:disabled)').forEach(btn=>{
+      btn.onclick=()=>{
+        cont.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('sel'));
+        btn.classList.add('sel');
+        document.getElementById('pm-size-err').style.display='none';
+        showToast(`Выбран размер ${btn.dataset.pmsize} (в наличии: ${btn.dataset.qty} шт.)`);
+      };
+    });
+  } else {
+    wrap.style.display='none';
+  }
+
+  const likeBtn = document.getElementById('pm-like-btn');
+  likeBtn.textContent = likes[id]?'♥ Лайк':'♡ Лайк';
+  likeBtn.onclick = ()=>{ doLike(id); likeBtn.textContent=likes[id]?'♥ Лайк':'♡ Лайк'; };
+
+  document.getElementById('pm-share-btn').onclick = ()=>doShare(id);
+
+  document.getElementById('pm-add-btn').onclick = ()=>{
+    const hasSizes = Object.keys(p.sizes||{}).length>0;
+    if(hasSizes){
+      const sel = cont.querySelector('.size-btn.sel');
+      if(!sel){ document.getElementById('pm-size-err').style.display='block'; showToast('Выберите размер'); return; }
+      addToCart(p.id, sel.dataset.pmsize);
+    } else {
+      addToCart(p.id, null);
+    }
+  };
+
+  document.getElementById('product-modal').classList.add('open');
+}
+
+// FULLSCREEN ZOOM / LIGHTBOX EVENT HANDLERS
+document.getElementById('pm-main-img').onclick = () => {
+  const src = document.getElementById('pm-main-img').src;
+  if (!src) return;
+  const zm = document.getElementById('zoom-modal');
+  document.getElementById('zoom-img').src = src;
+  zm.style.display = 'flex';
+};
+document.getElementById('zoom-modal').onclick = () => {
+  document.getElementById('zoom-modal').style.display = 'none';
+};
+
+function closePM(){ document.getElementById('product-modal').classList.remove('open'); }
+document.getElementById('product-modal').onclick = e=>{ if(e.target===document.getElementById('product-modal')) closePM(); };
+
+function updatePMGallery(){
+  const mainImg = document.getElementById('pm-main-img');
+  const placeholder = document.getElementById('pm-placeholder');
+  const nav = document.getElementById('pm-nav');
+  if(pmPhotos.length){
+    mainImg.src=pmPhotos[pmPhotoIdx]; mainImg.style.display='block'; placeholder.style.display='none';
+    nav.style.display=pmPhotos.length>1?'flex':'none';
+  } else {
+    mainImg.style.display='none'; placeholder.style.display='flex'; nav.style.display='none';
+  }
+  document.querySelectorAll('.pm-thumb').forEach((t,i)=>t.classList.toggle('active',i===pmPhotoIdx));
+}
+function pmNav(d){
+  if(!pmPhotos.length) return;
+  pmPhotoIdx=(pmPhotoIdx+d+pmPhotos.length)%pmPhotos.length;
+  updatePMGallery();
+}
+
+// ═══════════════════════════════════════════
+// CHECKOUT & TEXT OVERLAY LOGIC
+// ═══════════════════════════════════════════
+function openCheckout(){
+  document.getElementById('cart-drawer').classList.remove('open');
+  activePromo=null;
+  ['co-name','co-contact','co-city','co-address','co-zip','co-comment','co-promo'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('co-promo-msg').textContent='';
+  document.getElementById('co-promo-msg').style.color='';
+  renderCoSummary();
+  document.getElementById('checkout-modal').classList.add('open');
+}
+function closeCheckout(){ document.getElementById('checkout-modal').classList.open; }
+document.getElementById('checkout-modal').onclick = e=>{ if(e.target===document.getElementById('checkout-modal')) closeCheckout(); };
+
+function applyPromo(){
+  const code = document.getElementById('co-promo').value.trim().toUpperCase();
+  const msg = document.getElementById('co-promo-msg');
+  if(!code){ msg.textContent='Введите промокод'; msg.style.color='#ff0000'; return; }
+  const found = promos.find(p=>p.code.toUpperCase()===code && p.active);
+  if(!found){ activePromo=null; msg.textContent='Промокод не найден'; msg.style.color='#ff0000'; renderCoSummary(); return; }
+  activePromo=found;
+  msg.textContent=`✓ Скидка ${found.discount}%`; msg.style.color='#1a9e3f';
+  renderCoSummary();
+}
+
+function renderCoSummary(){
+  const sum = document.getElementById('co-summary');
+  if(!cart.length){ sum.innerHTML='<div style="opacity:.4">Корзина пуста</div>'; return; }
+  let total=0, rows='';
+  cart.forEach(ci=>{
+    const p=products.find(x=>x.id===ci.id); if(!p) return;
+    const lt=p.price*(ci.qty||1); total+=lt;
+    rows+=`<div class="co-summary-row"><span>${p.name}${ci.size?' / '+ci.size:''} × ${ci.qty||1}</span><span>${lt.toLocaleString('ru-RU')} ₽</span></div>`;
+  });
+  let disc=0, discRow='', finalTotal=total;
+  if(activePromo){ disc=Math.round(total*activePromo.discount/100); finalTotal=total-disc;
+    discRow=`<div class="co-summary-row" style="color:#1a9e3f"><span>Скидка ${activePromo.discount}%</span><span>−${disc.toLocaleString('ru-RU')} ₽</span></div>`; }
+  sum.innerHTML=rows+discRow+`<div class="co-summary-total"><span>Итого</span><span>${finalTotal.toLocaleString('ru-RU')} ₽</span></div>`;
+}
+
+// Покупка через текст (технические работы)
+function showTextCheckoutModal(clipboardText) {
+  navigator.clipboard.writeText(clipboardText).then(() => {
+    showToast('Данные заказа скопированы! ✓');
+  }).catch(() => {
+    showToast('Пожалуйста, выделите и скопируйте текст вручную');
+  });
+
+  const box = document.querySelector('#checkout-modal .co-box');
+  if(!box) return;
+
+  box.innerHTML = `
+    <button class="co-close" onclick="closeCheckout()">✕</button>
+    <div class="co-title" style="color:#000000; font-family:'Archivo Black', sans-serif;">ТЕХНИЧЕСКИЕ РАБОТЫ</div>
+    <p style="font-size:0.75rem; line-height:1.7; margin-bottom:18px; opacity:0.8;">
+      В данный момент на сайте проводятся технические работы. Оформление заказов временно перенесено в наш Telegram саппорт.
+    </p>
+    <p style="font-size:0.75rem; line-height:1.7; margin-bottom:18px; font-weight:bold; color:var(--fg);">
+      Мы автоматически скопировали все детали вашего заказа в буфер обмена!
+    </p>
+    <p style="font-size:0.7rem; line-height:1.7; margin-bottom:24px; opacity:0.6;">
+      Просто нажмите на кнопку ниже, чтобы перейти в диалог с саппортом, и вставьте туда скопированное сообщение (Ctrl+V или долгое нажатие -> Вставить).
+    </p>
+    
+    <textarea class="co-input" style="min-height:120px; font-size:0.65rem; margin-bottom:24px; background:var(--bg2);" readonly>${clipboardText}</textarea>
+    
+    <a href="https://t.me/NEVASTICKERBURG" target="_blank" class="co-submit" style="display:block; text-align:center; padding:18px; text-decoration:none;" onclick="closeCheckout()">
+      НАПИСАТЬ В TELEGRAM →
+    </a>
+  `;
+}
+
+async function submitOrder(){
+  const name=document.getElementById('co-name').value.trim();
+  const contact=document.getElementById('co-contact').value.trim();
+  if(!name||!contact){ showToast('Заполните имя и контакт'); return; }
+  if(!cart.length){ showToast('Корзина пуста'); return; }
+
+  const textCheckoutEnabled = getSetting('text_checkout_enabled') === 'true';
+
+  if (textCheckoutEnabled) {
+    let itemsText = cart.map(ci => {
+      const p = products.find(x => x.id === ci.id);
+      return p ? `- ${p.name} ${ci.size ? '['+ci.size+']' : ''} x ${ci.qty || 1} (${p.price} руб)` : '';
+    }).filter(Boolean).join('\n');
+
+    let totalVal = 0;
+    cart.forEach(ci => {
+      const p = products.find(x => x.id === ci.id);
+      if(p) totalVal += p.price * (ci.qty || 1);
+    });
+    if(activePromo) {
+      totalVal = totalVal - Math.round(totalVal * activePromo.discount / 100);
+    }
+
+    const city = document.getElementById('co-city').value.trim();
+    const address = document.getElementById('co-address').value.trim();
+    const zip = document.getElementById('co-zip').value.trim();
+    const comment = document.getElementById('co-comment').value.trim();
+    const promo = document.getElementById('co-promo').value.trim();
+
+    let clipboardText = `Заказ NEVASTICK:\n` +
+      `Имя: ${name}\n` +
+      `Контакты: ${contact}\n` +
+      `Доставка: ${city || 'не указан'}, ${address || 'не указан'} (${zip || 'нет'})\n` +
+      `Промокод: ${promo || 'нет'}\n` +
+      `Комментарий: ${comment || 'нет'}\n\n` +
+      `Товары:\n${itemsText}\n` +
+      `Итого к оплате: ${totalVal} руб.`;
+
+    cart = [];
+    saveCart();
+    updateCartUI();
+    
+    showTextCheckoutModal(clipboardText);
+    return;
+  }
+
+  const btn=document.getElementById('co-submit');
+  btn.disabled=true; btn.textContent='Отправляем...';
+
+  const items=cart.map(ci=>{ const p=products.find(x=>x.id===ci.id); return p?{id:ci.id,name:p.name+(ci.size?' / '+ci.size:''),price:p.price,qty:ci.qty||1,size:ci.size||null}:null; }).filter(Boolean);
+  const rawTotal=items.reduce((s,i)=>s+i.price*i.qty,0);
+  const discount=activePromo?Math.round(rawTotal*activePromo.discount/100):0;
+  const total=rawTotal-discount;
+  const fullAddress=[document.getElementById('co-city').value.trim(),document.getElementById('co-address').value.trim(),document.getElementById('co-zip').value.trim()].filter(Boolean).join(', ');
+
+  const order={
+    customer_name:name, contact, address:fullAddress,
+    delivery:'СДЭК — пункт выдачи',
+    comment:document.getElementById('co-comment').value.trim(),
+    promo_code:activePromo?activePromo.code:'',
+    discount, raw_total:rawTotal, total,
+    items:JSON.stringify(items), status:'pending'
+  };
+
+  try{
+    const [saved]=await sbInsert('orders',order);
+    const localOrders = JSON.parse(localStorage.getItem('neva_orders')||'[]');
+    localOrders.unshift({...saved, items});
+    localStorage.setItem('neva_orders', JSON.stringify(localOrders));
+    orders.unshift({...saved, items});
+
+    cart=[]; activePromo=null;
+    saveCart(); updateCartUI();
+    closeCheckout();
+    document.getElementById('cart-drawer').classList.remove('open');
+    showToast('Заказ оформлен ✓');
+    updateOrdersBadge();
+  } catch(e){
+    console.error(e);
+    showToast('Ошибка отправки — повторите попытку');
+  }
+  btn.disabled=false; btn.textContent='Подтвердить заказ →';
+}
+
+// ═══════════════════════════════════════════
+// MY ORDERS
+// ═══════════════════════════════════════════
+const STATUS_LABELS={pending:'Принят',confirmed:'Подтверждён',shipped:'Отправлен',done:'Доставлен',cancelled:'Отменён'};
+
+async function openOrdersPanel(){
+  const localOrders = JSON.parse(localStorage.getItem('neva_orders')||'[]');
+  const list=document.getElementById('orders-list-client');
+  document.getElementById('orders-panel').classList.add('open');
+  list.innerHTML='<div class="op-empty" style="opacity:.4">Загрузка...</div>';
+
+  if(!localOrders.length){ list.innerHTML='<div class="op-empty">Заказов пока нет</div>'; return; }
+
+  let liveStatuses = {};
+  try {
+    const ids = localOrders.map(o=>o.id).join(',');
+    const fresh = await sbGet('orders', `id=in.(${ids})&select=id,status`) || [];
+    fresh.forEach(o=>{ liveStatuses[o.id]=o.status; });
+  } catch(e){ }
+
+  list.innerHTML='';
+  localOrders.forEach(o=>{
+    const status = liveStatuses[o.id] || o.status;
+    o.status = status;
+    const items=Array.isArray(o.items)?o.items:(typeof o.items==='string'?JSON.parse(o.items):[]);
+    const itemsStr=items.map(i=>`${i.name} × ${i.qty}`).join(', ');
+    const el=document.createElement('div'); el.className='op-order';
+    el.innerHTML=`
+      <div class="op-order-id">${o.id} · ${new Date(o.created_at||Date.now()).toLocaleString('ru-RU')}</div>
+      <div class="op-order-items">${itemsStr}</div>
+      ${o.address?`<div class="op-order-items" style="opacity:.4">${o.delivery} · ${o.address}</div>`:''}
+      ${o.promo_code?`<div class="op-order-items" style="color:#1a9e3f">Промокод: ${o.promo_code} (−${(o.discount||0).toLocaleString('ru-RU')} ₽)</div>`:''}
+      <div class="op-order-total">${(o.total||0).toLocaleString('ru-RU')} ₽</div>
+      <span class="op-status ${status}">${STATUS_LABELS[status]||status}</span>`;
+    list.appendChild(el);
+  });
+  localStorage.setItem('neva_orders', JSON.stringify(localOrders));
+}
+function closeOrdersPanel(){ document.getElementById('orders-panel').classList.remove('open'); }
+document.getElementById('orders-panel').onclick=e=>{ if(e.target===document.getElementById('orders-panel')) closeOrdersPanel(); };
+
+// ═══════════════════════════════════════════
+// LIKES & SHARE
+// ═══════════════════════════════════════════
+function doLike(id){
+  likes[id]=!likes[id];
+  saveLikes();
+  document.querySelectorAll(`[data-pid="${id}"] [data-action="like"]`).forEach(btn=>{
+    btn.textContent = likes[id]?'♥':'♡';
+    btn.classList.toggle('liked',!!likes[id]);
+  });
+}
+function doShare(id){
+  const url=window.location.href.split('?')[0]+'?item='+id;
+  navigator.clipboard.writeText(url).catch(()=>{});
+  showToast('Ссылка скопирована');
+}
+
+// ═══════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; clearTimeout(toastTimer);
+  t.classList.add('show');
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+// ═══════════════════════════════════════════
+// FILTER / NAV / MENU
+// ═══════════════════════════════════════════
+function filterAll(){ activeFilter=null; closeMenu(); renderSite(); }
+function filterCat(c){ activeFilter=c; closeMenu(); renderSite(); }
+function openMenu(){ document.getElementById('menu-overlay').classList.add('open'); }
+function closeMenu(){ document.getElementById('menu-overlay').classList.remove('open'); }
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').classList.toggle('scrolled',window.scrollY>60);
+});
+
+// ═══════════════════════════════════════════
+// ADMIN — PASSWORD
+// ═══════════════════════════════════════════
+let _sc=0,_st=null;
+document.getElementById('support-btn').addEventListener('click',e=>{
+  e.preventDefault(); _sc++;
+  clearTimeout(_st);
+  if(_sc>=2){ _sc=0; openPwModal(); return; }
+  _st=setTimeout(()=>{ if(_sc<2) window.open('https://t.me/NEVASTICKERBURG','_blank'); _sc=0; },400);
+});
+function openPwModal(){ document.getElementById('pw-modal').classList.add('open'); setTimeout(()=>document.getElementById('pw-input').focus(),100); }
+function checkPw(){
+  const v=document.getElementById('pw-input').value;
+  if(v==='1965'){
+    document.getElementById('pw-modal').classList.remove('open');
+    document.getElementById('pw-input').value='';
+    openAdmin();
+  } else {
+    const inp=document.getElementById('pw-input');
+    inp.classList.add('error'); setTimeout(()=>inp.classList.remove('error'),400);
+  }
+}
+
+// ═══════════════════════════════════════════
+// ADMIN PANEL
+// ═══════════════════════════════════════════
+function openAdmin(){
+  document.getElementById('admin-modal').classList.add('open');
+  renderAdminProducts(); renderAdminSections(); renderAdminOrders(); renderAdminPromos();
+  updateOrdersBadge();
+  const bgUrl=getSetting('header_bg');
+  if(bgUrl){ document.getElementById('hdr-data').value=bgUrl; const p=document.getElementById('hdr-prev'); p.src=bgUrl; p.style.display='block'; }
+  document.getElementById('design-sub').value=getSetting('header_sub','FESTIVAL STREET-ART & URBAN CULTURE');
+
+  let storedBgs = [];
+  try {
+    const val = getSetting('ticket_bgs');
+    if(val) storedBgs = JSON.parse(val);
+  } catch(e) {}
+  adminTicketBgs = storedBgs;
+  renderAdminTicketBgs();
+
+  document.getElementById('design-text-checkout').checked = getSetting('text_checkout_enabled') === 'true';
+}
+function closeAdmin(){ document.getElementById('admin-modal').classList.remove('open'); }
+
+function switchTab(tab){
+  document.querySelectorAll('.admin-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
+  document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+}
+
+function updateOrdersBadge(){
+  const badge=document.getElementById('admin-orders-badge');
+  const count=(orders||[]).filter(o=>o.status==='pending').length;
+  badge.textContent=count; badge.style.display=count>0?'inline':'none';
+}
+
+// ── PRODUCTS ──
+let pfPhotos=[], pfSizes={};
+
+function renderAdminProducts(){
+  const list=document.getElementById('admin-products-list');
+  list.innerHTML='';
+  if(!products.length){ list.innerHTML='<p style="font-size:.65rem;opacity:.4;letter-spacing:.15em;text-transform:uppercase;color:#000000;margin-bottom:16px">Нет товаров</p>'; return; }
+  products.forEach(p=>{
+    const row=document.createElement('div'); row.className='admin-product-row';
+    const thumb=(p.imgs&&p.imgs[0])?`<img src="${p.imgs[0]}" alt="${p.name}">`:`<div style="width:40px;height:50px;background:#fff;border:1px solid #000;display:flex;align-items:center;justify-content:center;font-size:1rem;opacity:.15;color:#000">N</div>`;
+    const sizesStr=Object.keys(p.sizes||{}).length?Object.entries(p.sizes).map(([k,v])=>`${k}:${v}`).join(' '):'без разм.';
+    row.innerHTML=`${thumb}<div class="admin-product-info"><div class="admin-product-name">${p.name}</div><div class="admin-product-meta">${p.cat||'—'} · ${Number(p.price).toLocaleString('ru-RU')} ₽ · ${sizesStr}</div></div><div class="admin-product-btns"><button class="admin-btn secondary sm" data-edit="${p.id}">Ред.</button><button class="admin-btn danger sm" data-del="${p.id}">Удалить</button></div>`;
+    list.appendChild(row);
+  });
+  list.onclick=e=>{
+    const e2=e.target.dataset.edit; if(e2){ openProductForm(e2); return; }
+    const d=e.target.dataset.del; if(d) deleteProduct(d);
+  };
+}
+
+function populateSectionSel(selId){
+  const sel=document.getElementById('pf-section');
+  sel.innerHTML='<option value="">— Без раздела —</option>';
+  sections.forEach(s=>{ const o=document.createElement('option'); o.value=s.id; o.textContent=s.name; if(s.id===selId) o.selected=true; sel.appendChild(o); });
+}
+
+function openProductForm(id){
+  const p=id?products.find(x=>x.id===id):null;
+  pfPhotos=p?[...(p.imgs||[])]:[];
+  pfSizes=p?{...(p.sizes||{})}:{};
+  document.getElementById('pf-edit-id').value=id||'';
+  document.getElementById('pf-title').textContent=id?'Редактировать':'Новый товар';
+  document.getElementById('pf-name').value=p?p.name:'';
+  document.getElementById('pf-price').value=p?p.price:'';
+  document.getElementById('pf-cat').value=p?p.cat:'';
+  document.getElementById('pf-desc').value=p?p.desc||'':'';
+  document.getElementById('pf-badge').value=p?p.badge||'':'';
+  document.getElementById('pf-new-size').value='';
+  populateSectionSel(p?p.section_id||'':'');
+  renderPfPhotos(); renderPfSizes();
+  document.getElementById('product-form').style.display='block';
+  document.getElementById('product-form').scrollIntoView({behavior:'smooth'});
+}
+function cancelProductForm(){ document.getElementById('product-form').style.display='none'; }
+
+function compressImage(file, maxDim = 1400, quality = 0.75){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > height && width > maxDim){ height = Math.round(height * (maxDim/width)); width = maxDim; }
+        else if (height > maxDim){ width = Math.round(width * (maxDim/height)); height = maxDim; }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function pfAddImages(input){
+  const files=Array.from(input.files);
+  for (const f of files){
+    try{
+      const compressed = await compressImage(f);
+      pfPhotos.push(compressed);
+      renderPfPhotos();
+    }catch(err){
+      console.warn('compression failed, falling back to original', err);
+      const r = new FileReader();
+      r.onload = e => { pfPhotos.push(e.target.result); renderPfPhotos(); };
+      r.readAsDataURL(f);
+    }
+  }
+  input.value='';
+}
+function renderPfPhotos(){
+  const g=document.getElementById('pf-photos-grid'); g.innerHTML='';
+  pfPhotos.forEach((img,idx)=>{ const w=document.createElement('div'); w.className='admin-photo-thumb'; w.innerHTML=`<img src="${img}" alt=""><button class="admin-photo-del" data-idx="${idx}">✕</button>`; g.appendChild(w); });
+  g.onclick=e=>{ const b=e.target.closest('[data-idx]'); if(b){ pfPhotos.splice(parseInt(b.dataset.idx),1); renderPfPhotos(); } };
+}
+
+function pfAddSize(){
+  const sz=document.getElementById('pf-new-size').value.trim().toUpperCase();
+  if(!sz){ showToast('Введите размер'); return; }
+  if(pfSizes.hasOwnProperty(sz)){ showToast('Такой размер уже есть'); return; }
+  pfSizes[sz]=0; document.getElementById('pf-new-size').value='';
+  renderPfSizes();
+}
+function renderPfSizes(){
+  const g=document.getElementById('pf-sizes-grid'); g.innerHTML='';
+  const entries=Object.entries(pfSizes);
+  if(!entries.length){ g.innerHTML='<p style="font-size:.55rem;opacity:.3;color:#000000;grid-column:1/-1;letter-spacing:.1em">Добавьте размер</p>'; return; }
+  entries.forEach(([sz,qty])=>{
+    const w=document.createElement('div'); w.className='pf-size-cell';
+    w.innerHTML=`<div class="pf-size-label">${sz}</div><input type="number" min="0" value="${qty}" data-sz="${sz}" class="admin-input" style="padding:5px 8px"><button class="pf-size-del" data-delsz="${sz}">✕</button>`;
+    g.appendChild(w);
+  });
+  g.oninput=e=>{ const inp=e.target.closest('[data-sz]'); if(inp) pfSizes[inp.dataset.sz]=parseInt(inp.value)||0; };
+  g.onclick=e=>{ const b=e.target.closest('[data-delsz]'); if(b){ delete pfSizes[b.dataset.delsz]; renderPfSizes(); } };
+}
+
+async function saveProduct(){
+  const id=document.getElementById('pf-edit-id').value;
+  const data={
+    name:document.getElementById('pf-name').value.trim().toUpperCase()||'ТОВАР',
+    price:parseInt(document.getElementById('pf-price').value)||0,
+    cat:document.getElementById('pf-cat').value.trim(),
+    section_id:document.getElementById('pf-section').value||null,
+    desc:document.getElementById('pf-desc').value.trim(),
+    badge:document.getElementById('pf-badge').value.trim().toUpperCase(),
+    imgs:pfPhotos, sizes:pfSizes
+  };
+  try{
+    if(id){
+      const [updated]=await sbUpdate('products',`id=eq.${id}`,data);
+      const idx=products.findIndex(x=>x.id===id);
+      if(idx>=0) products[idx]={...products[idx],...updated};
+    } else {
+      const [created]=await sbInsert('products',data);
+      products.push(created);
+    }
+    renderSite(); renderAdminProducts(); cancelProductForm();
+    showToast('Сохранено');
+  } catch(e){ console.error(e); showToast('Ошибка сохранения: '+e.message); }
+}
+
+async function deleteProduct(id){
+  if(!confirm('Удалить товар?')) return;
+  try{
+    await sbDelete('products',`id=eq.${id}`);
+    products=products.filter(p=>p.id!==id);
+    cart=cart.filter(i=>i.id!==id); saveCart();
+    renderSite(); renderAdminProducts(); updateCartUI();
+    showToast('Товар удалён');
+  } catch(e){ showToast('Ошибка: '+e.message); }
+}
+
+// ── SECTIONS ──
+function renderAdminSections(){
+  const list=document.getElementById('admin-sections-list'); list.innerHTML='';
+  if(!sections.length){ list.innerHTML='<p style="font-size:.65rem;opacity:.4;letter-spacing:.15em;text-transform:uppercase;color:#000000;margin-bottom:16px">Нет разделов</p>'; return; }
+  sections.forEach(s=>{
+    const row=document.createElement('div'); row.className='admin-section-row';
+    row.innerHTML=`<div class="admin-section-row-name">${s.name}</div><span style="font-size:.65rem;font-weight:bold;margin-right:auto;color:#000000">Порядок: ${s.sort_order||0}</span><button class="admin-btn danger sm" data-del="${s.id}">Удалить</button>`;
+    list.appendChild(row);
+  });
+  list.onclick=e=>{ const b=e.target.closest('[data-del]'); if(b) deleteSection(b.dataset.del); };
+}
+async function addSection(){
+  const name=document.getElementById('sec-name').value.trim(); if(!name) return;
+  const data={name, sort_order:parseInt(document.getElementById('sec-order').value)||0, img_url:document.getElementById('sec-img-data').value||null};
+  try{
+    const [created]=await sbInsert('sections',data);
+    sections.push(created);
+    renderSite(); renderAdminSections(); populateSectionSel('');
+    document.getElementById('sec-name').value=''; document.getElementById('sec-order').value='';
+    document.getElementById('sec-img-data').value=''; document.getElementById('sec-img-prev').style.display='none';
+    showToast('Раздел добавлен');
+  } catch(e){ showToast('Ошибка: '+e.message); }
+}
+async function deleteSection(id){
+  if(!confirm('Удалить раздел?')) return;
+  try{
+    await sbDelete('sections',`id=eq.${id}`);
+    sections=sections.filter(s=>s.id!==id);
+    products.forEach(p=>{ if(p.section_id===id) p.section_id=null; });
+    renderSite(); renderAdminSections();
+    showToast('Раздел удалён');
+  } catch(e){ showToast('Ошибка: '+e.message); }
+}
+
+// ── ORDERS ──
+function renderAdminOrders(){
+  const list=document.getElementById('admin-orders-list'); list.innerHTML='';
+  if(!orders.length){ list.innerHTML='<p style="font-size:.65rem;opacity:.4;letter-spacing:.2em;text-transform:uppercase;color:#000000;padding:20px 0">Заказов пока нет</p>'; return; }
+  orders.forEach(o=>{
+    const items=Array.isArray(o.items)?o.items:(typeof o.items==='string'?JSON.parse(o.items):[]);
+    const itemsStr=items.map(i=>`${i.name} × ${i.qty}`).join(', ');
+    const el=document.createElement('div'); el.className='admin-order-row';
+    el.innerHTML=`
+      <div class="admin-order-id">${o.id} · ${new Date(o.created_at).toLocaleString('ru-RU')}</div>
+      <div class="admin-order-info">${o.customer_name} · ${o.contact}${o.address?' · '+o.address:''}</div>
+      ${o.delivery?`<div class="admin-order-info" style="opacity:.4">${o.delivery}</div>`:''}
+      <div class="admin-order-info">${itemsStr}</div>
+      ${o.promo_code?`<div class="admin-order-info" style="color:#000000; font-weight:bold;">Промокод: ${o.promo_code} (−${(o.discount||0).toLocaleString('ru-RU')} ₽)</div>`:''}
+      ${o.comment?`<div class="admin-order-info" style="opacity:.4">Комментарий: ${o.comment}</div>`:''}
+      <div class="admin-order-total">${(o.total||0).toLocaleString('ru-RU')} ₽</div>
+      <div class="admin-order-bottom">
+        <select class="status-select" data-oid="${o.id}">
+          <option value="pending"${o.status==='pending'?' selected':''}>Принят</option>
+          <option value="confirmed"${o.status==='confirmed'?' selected':''}>Подтверждён</option>
+          <option value="shipped"${o.status==='shipped'?' selected':''}>Отправлен</option>
+          <option value="done"${o.status==='done'?' selected':''}>Доставлен</option>
+          <option value="cancelled"${o.status==='cancelled'?' selected':''}>Отменён</option>
+        </select>
+        <button class="admin-btn danger sm" data-delorder="${o.id}">Удалить</button>
+      </div>`;
+    list.appendChild(el);
+  });
+  list.onchange=e=>{ const sel=e.target.closest('[data-oid]'); if(sel) setOrderStatus(sel.dataset.oid, sel.value); };
+  list.onclick=e=>{ const b=e.target.closest('[data-delorder]'); if(b) deleteOrder(b.dataset.delorder); };
+}
+async function setOrderStatus(id, status){
+  try{
+    await sbUpdate('orders',`id=eq.${id}`,{status});
+    const o=orders.find(x=>x.id===id); if(o) o.status=status;
+    renderAdminOrders(); updateOrdersBadge();
+  } catch(e){ showToast('Ошибка: '+e.message); }
+}
+async function deleteOrder(id){
+  if(!confirm('Удалить заказ?')) return;
+  try{
+    await sbDelete('orders',`id=eq.${id}`);
+    orders=orders.filter(o=>o.id!==id);
+    renderAdminOrders(); updateOrdersBadge();
+  } catch(e){ showToast('Ошибка: '+e.message); }
+}
+
+// ── PROMOS ──
+function renderAdminPromos(){
+  const list=document.getElementById('admin-promos-list'); list.innerHTML='';
+  if(!promos.length){ list.innerHTML='<p style="font-size:.65rem;opacity:.4;letter-spacing:.15em;text-transform:uppercase;color:#000000;margin-bottom:16px">Промокодов пока нет</p>'; return; }
+  promos.forEach(p=>{
+    const row=document.createElement('div'); row.className='admin-order-row';
+    row.style.display='flex'; row.style.alignItems='center'; row.style.gap='12px';
+    row.innerHTML=`<div style="flex:1"><div class="admin-product-name" style="color:#000000">${p.code}</div><div class="admin-product-meta">Скидка: ${p.discount}% · ${p.active?'<span style="color:#1a9e3f">Активен</span>':'<span style="color:#ff0000">Отключён</span>'}</div></div><div style="display:flex;gap:6px"><button class="admin-btn secondary sm" data-toggle="${p.id}">${p.active?'Откл.':'Вкл.'}</button><button class="admin-btn danger sm" data-delpromo="${p.id}">Удалить</button></div>`;
+    list.appendChild(row);
+  });
+  list.onclick=e=>{
+    const t=e.target.closest('[data-toggle]'); if(t){ togglePromo(t.dataset.toggle); return; }
+    const d=e.target.closest('[data-delpromo]'); if(d) deletePromo(d.dataset.delpromo);
+  };
+}
+async function addPromo(){
+  const code=document.getElementById('promo-code').value.trim().toUpperCase();
+  const discount=parseInt(document.getElementById('promo-discount').value)||0;
+  if(!code){ showToast('Введите код'); return; }
+  if(discount<1||discount>100){ showToast('Скидка 1–100%'); return; }
+  if(promos.find(p=>p.code.toUpperCase()===code)){ showToast('Такой код уже есть'); return; }
+  try{
+    const [created]=await sbInsert('promos',{code,discount,active:true});
+    promos.push(created);
+    renderAdminPromos();
+    document.getElementById('promo-code').value=''; document.getElementById('promo-discount').value='';
+    showToast('Промокод добавлен');
+  } catch(e){ showToast('Ошибка: '+e.message); }
+}
+async function togglePromo(id){
+  const p=promos.find(x=>x.id===id); if(!p) return;
+  try{ await sbUpdate('promos',`id=eq.${id}`,{active:!p.active}); p.active=!p.active; renderAdminPromos(); }
+  catch(e){ showToast('Ошибка: '+e.message); }
+}
+async function deletePromo(id){
+  if(!confirm('Удалить промокод?')) return;
+  try{ await sbDelete('promos',`id=eq.${id}`); promos=promos.filter(p=>p.id!==id); renderAdminPromos(); showToast('Удален'); }
+  catch(e){ showToast('Ошибка: '+e.message); }
+}
+
+// ── DESIGN & SETTINGS ──
+async function saveDesignSub(){
+  const v=document.getElementById('design-sub').value.trim()||'FESTIVAL STREET-ART & URBAN CULTURE';
+  await setSetting('header_sub',v); applySettings(); showToast('Сохранено');
+}
+async function saveHeader(){
+  const v=document.getElementById('hdr-data').value;
+  await setSetting('header_bg',v); applySettings(); showToast('Фон обновлен');
+}
+
+let adminTicketBgs = [];
+
+async function adminAddTicketBg(input) {
+  const files = Array.from(input.files);
+  for (const f of files) {
+    try {
+      const compressed = await compressImage(f, 1400, 0.75);
+      adminTicketBgs.push(compressed);
+      renderAdminTicketBgs();
+    } catch(e) {
+      console.warn(e);
+    }
+  }
+  input.value = '';
+}
+
+function renderAdminTicketBgs() {
+  const g = document.getElementById('admin-ticket-bgs-grid');
+  if(!g) return;
+  g.innerHTML = '';
+  adminTicketBgs.forEach((img, idx) => {
+    const w = document.createElement('div');
+    w.className = 'admin-photo-thumb';
+    w.innerHTML = `<img src="${img}" alt=""><button class="admin-photo-del" data-bgidx="${idx}">✕</button>`;
+    g.appendChild(w);
+  });
+  g.onclick = e => {
+    const b = e.target.closest('[data-bgidx]');
+    if(b) {
+      adminTicketBgs.splice(parseInt(b.dataset.bgidx), 1);
+      renderAdminTicketBgs();
+    }
+  };
+}
+
+async function saveDesignSettings() {
+  const textCh = document.getElementById('design-text-checkout').checked ? 'true' : 'false';
+  await setSetting('text_checkout_enabled', textCh);
+  await setSetting('ticket_bgs', JSON.stringify(adminTicketBgs));
+  
+  showToast('Настройки оформления сохранены');
+  renderSite();
+}
+
+async function resetAll(){
+  if(!confirm('Сбросить ВСЕ данные в базе?')) return;
+  try{
+    if(products.length) await sbDelete('products','id=neq.00000000-0000-0000-0000-000000000000');
+    if(sections.length) await sbDelete('sections','id=neq.00000000-0000-0000-0000-000000000000');
+    if(orders.length) await sbDelete('orders','id=neq.00000000-0000-0000-0000-000000000000');
+    if(promos.length) await sbDelete('promos','id=neq.00000000-0000-0000-0000-000000000000');
+  } catch(e){ console.warn('reset:', e); }
+  products=[]; sections=[]; orders=[]; promos=[]; settings={};
+  cart=[]; saveCart();
+  localStorage.removeItem('neva_orders');
+  renderSite(); renderAdminProducts(); renderAdminSections(); renderAdminOrders(); renderAdminPromos();
+  updateCartUI(); updateOrdersBadge(); applySettings();
+  showToast('Данные сброшены');
+}
+
+// ── UPLOAD HELPER ──
+function previewImg(input,prevId,dataId){
+  const f=input.files[0]; if(!f) return;
+  compressImage(f, 1600, 0.8).then(dataUrl=>{
+    document.getElementById(dataId).value=dataUrl;
+    const p=document.getElementById(prevId); p.src=dataUrl; p.style.display='block';
+  }).catch(()=>{
+    const r=new FileReader();
+    r.onload=e=>{ document.getElementById(dataId).value=e.target.result; const p=document.getElementById(prevId); p.src=e.target.result; p.style.display='block'; };
+    r.readAsDataURL(f);
+  });
+}
+
+init();
+</script>
+</body>
+</html>
