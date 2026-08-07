@@ -3205,38 +3205,35 @@ function renderPfSizes(){
 }
 async function saveProduct() {
     const id = document.getElementById('pf-edit-id').value;
-    
-    // БЕЗОПАСНОЕ получение данных
     const name = document.getElementById('pf-name').value.trim().toUpperCase() || 'ТОВАР';
     const price = parseInt(document.getElementById('pf-price').value) || 0;
     const cat = document.getElementById('pf-cat').value.trim();
     const section_id = document.getElementById('pf-section').value || null;
     const desc = document.getElementById('pf-desc').value.trim();
     const badge = document.getElementById('pf-badge').value.trim().toUpperCase();
-    
-    // ГЛАВНОЕ ИСПРАВЛЕНИЕ: БЕЗОПАСНОЕ копирование массива
+
+    // ************ ИСПРАВЛЕНИЕ ТУТ ************
+    // Теперь массив берется максимально безопасно
     let imgs = [];
-    if (pfPhotos && Array.isArray(pfPhotos)) {
-        imgs = [...pfPhotos];
+    if (pfPhotos && typeof pfPhotos === 'object' && pfPhotos.length !== undefined) {
+        // Если это массивоподобный объект, превращаем его в массив
+        imgs = Array.from(pfPhotos);
+    } else {
+        imgs = [];
     }
-    
-    // БЕЗОПАСНОЕ копирование объекта
+
     let sizes = {};
     if (pfSizes && typeof pfSizes === 'object') {
         sizes = { ...pfSizes };
     }
-    
+    // ****************************************
+
     const data = {
-        name,
-        price,
-        cat,
-        section_id,
-        description: desc,
-        badge,
+        name, price, cat, section_id, description: desc, badge,
         imgs: imgs,
         sizes: sizes
     };
-    
+
     try {
         if (id) {
             const [updated] = await sbUpdate('products', `id=eq.${id}`, data);
@@ -3255,17 +3252,6 @@ async function saveProduct() {
         showToast('Ошибка сохранения: ' + e.message);
     }
 }
-async function deleteProduct(id){
-  if(!confirm('Удалить товар?')) return;
-  try{
-    await sbDelete('products',`id=eq.${id}`);
-    products=products.filter(p=>p.id!==id);
-    cart=cart.filter(i=>i.id!==id); saveCart();
-    renderSite(); renderAdminProducts(); updateCartUI();
-    showToast('Товар удалён');
-  } catch(e){ showToast('Ошибка: '+e.message); }
-}
-
 // ── SECTIONS ──
 function renderAdminSections(){
   const list=document.getElementById('admin-sections-list'); list.innerHTML='';
