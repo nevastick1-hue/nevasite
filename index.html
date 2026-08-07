@@ -1,4 +1,3 @@
-
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -24,7 +23,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  border-radius: 0 !important; /* Убираем скругления для бруталистского стиля */
+  border-radius: 0 !important;
 }
 
 html {
@@ -211,6 +210,14 @@ a {
   background: var(--bg);
   padding: 120px 0 60px;
 }
+#header-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.15;
+  z-index: 1;
+}
 .header-content {
   position: relative;
   z-index: 2;
@@ -237,15 +244,7 @@ a {
   color: var(--fg);
   line-height: 1.1;
   margin-top: 8px;
-  margin-bottom: 32px; /* Увеличен отступ, так как убраны сердечки */
-}
-.header-doodles {
-  font-size: clamp(1.8rem, 6vw, 3rem);
-  color: var(--fg);
-  line-height: 1;
   margin-bottom: 32px;
-  letter-spacing: 0.15em;
-  user-select: none;
 }
 
 /* MARQUEE */
@@ -1933,7 +1932,7 @@ footer {
     </div>
     <p class="header-sub" id="header-sub-text">FESTIVAL STREET-ART & URBAN CULTURE</p>
     
-    <!-- Движущаяся лента / Marquee -->
+    <!-- Marquee -->
     <div class="marquee-container">
       <div class="marquee-inner">
         <span>25 АВГУСТА БРУСНИЦЫН NEVASTICK4 СТРИТ-АРТ УЛИЧНОЕ ИСКУССТВО КОММЬЮНИТИ • 25 АВГУСТА БРУСНИЦЫН NEVASTICK4 СТРИТ-АРТ УЛИЧНОЕ ИСКУССТВО КОММЬЮНИТИ • </span>
@@ -1941,13 +1940,13 @@ footer {
       </div>
     </div>
 
-    <!-- Блок билетов со слайд-шоу -->
+    <!-- Tickets Slideshow -->
     <div class="tickets-box" id="tickets-box">
       <div class="tickets-slides" id="tickets-slides"></div>
       <div class="tickets-overlay"></div>
       <div class="tickets-inner-content">
         <p class="tickets-heading">БИЛЕТЫ</p>
-        <a href="https://qtickets.ru/event/250610?base_color=252525" class="qtickets-button">Купить билеты</a>
+        <a href="https://qtickets.ru/event/250610?base_color=252525" target="_blank" class="qtickets-button">Купить билеты</a>
       </div>
     </div>
 
@@ -2030,9 +2029,9 @@ footer {
   </div>
 </div>
 
-<!-- CHECKOUT -->
+<!-- CHECKOUT MODAL -->
 <div id="checkout-modal">
-  <div class="co-box">
+  <div class="co-box" id="co-box-content">
     <button class="co-close" onclick="closeCheckout()">✕</button>
     <div class="co-title">Оформление заказа</div>
     <p class="co-step">1 — Контактные данные</p>
@@ -2081,6 +2080,16 @@ footer {
     <button class="admin-close-btn" onclick="closeAdmin()">✕ Закрыть</button>
     <div class="admin-title">Admin Panel</div>
     <p class="admin-sub">Nevastick Merch Store</p>
+    
+    <!-- Кнопка быстрого управления тех. работами -->
+    <div style="padding:16px; background:#f5f5e8; border:2px solid #000; margin-bottom:28px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+      <div>
+        <strong style="font-size:0.8rem; text-transform:uppercase;">Технические работы (Заказ через Telegram):</strong>
+        <p style="font-size:0.65rem; opacity:0.7; margin-top:2px;">При включении покупатели информируются о тех. работах, а детали их заказа автоматически копируются для отправки в Telegram.</p>
+      </div>
+      <button id="tech-work-toggle-btn" class="admin-btn primary" onclick="toggleTechWorkMode()">Переключить</button>
+    </div>
+
     <div class="admin-tabs">
       <button class="admin-tab active" data-tab="products" onclick="switchTab('products')">Товары</button>
       <button class="admin-tab" data-tab="sections" onclick="switchTab('sections')">Разделы</button>
@@ -2122,17 +2131,17 @@ footer {
         </div>
         <div class="admin-form-row full">
           <div class="admin-field">
-            <label>Фотографии (можно несколько)</label>
+            <label>Фотографии (можно загрузить любое количество)</label>
             <div class="upload-area" onclick="document.getElementById('pf-img-input').click()">
               <input type="file" id="pf-img-input" accept="image/*" multiple onchange="pfAddImages(this)">
-              <p>Нажмите для загрузки</p>
+              <p>Нажмите для загрузки фото</p>
             </div>
             <div class="admin-photos-grid" id="pf-photos-grid"></div>
           </div>
         </div>
         <input type="hidden" id="pf-edit-id">
         <div style="display:flex;gap:12px;margin-top:20px">
-          <button class="admin-btn primary" onclick="saveProduct()">Сохранить</button>
+          <button class="admin-btn primary" onclick="saveProduct()">Сохранить товар</button>
           <button class="admin-btn secondary" onclick="cancelProductForm()">Отмена</button>
         </div>
       </div>
@@ -2185,11 +2194,10 @@ footer {
 
     <!-- DESIGN TAB -->
     <div class="admin-panel" id="tab-design">
-      <!-- Настройки режима Покупка через текст -->
-      <p class="admin-section-title">Режим приема заказов</p>
+      <p class="admin-section-title">Режим приёма заказов</p>
       <div class="admin-field" style="flex-direction:row; align-items:center; gap:12px; margin-bottom:24px;">
-        <input type="checkbox" id="design-text-checkout" style="width:20px; height:20px; cursor:pointer;">
-        <label for="design-text-checkout" style="cursor:pointer; font-size:0.75rem; font-weight:bold; color:#000;">Включить режим "Покупка через текст" (технические работы)</label>
+        <input type="checkbox" id="design-text-checkout" onchange="toggleTechWorkModeFromCheckbox(this.checked)" style="width:20px; height:20px; cursor:pointer;">
+        <label for="design-text-checkout" style="cursor:pointer; font-size:0.75rem; font-weight:bold; color:#000;">Включить режим "Технические работы" (Заказ через копирование текста в Telegram)</label>
       </div>
 
       <p class="admin-section-title">Подзаголовок шапки</p>
@@ -2225,7 +2233,7 @@ footer {
       <div style="margin-bottom:32px"><button class="admin-btn primary" onclick="saveHeader()">Сохранить фон</button></div>
 
       <div style="margin-top:24px; border-top:2px solid #000; padding-top:24px;">
-        <button class="admin-btn primary" onclick="saveDesignSettings()">Сохранить настройки оформления и режима заказа</button>
+        <button class="admin-btn primary" onclick="saveDesignSettings()">Сохранить все настройки</button>
       </div>
 
       <p class="admin-section-title" style="margin-top:40px">Опасная зона</p>
@@ -2238,19 +2246,19 @@ footer {
 // ═══════════════════════════════════════════
 // SUPABASE CONFIG
 // ═══════════════════════════════════════════
-// ═══════════════════════════════════════════
-// SUPABASE CONFIG
 const SB_URL = 'https://fpgxynmunbpnjdxbzevm.supabase.co';
 const SB_KEY = 'sb_publishable_u2nI1hWjERH2c2tvD45U9A_c4iW3j6T';
 
 async function sbFetch(path, opts={}) {
-    const r = await fetch(SB_URL+'/rest/v1/'+path, {
-        headers: {
-            apikey: SB_KEY,
-            Authorization: 'Bearer '+SB_KEY,
-            'Content-Type': 'application/json'
-        },
-        ...opts
+    const headers = {
+        apikey: SB_KEY,
+        Authorization: 'Bearer ' + SB_KEY,
+        'Content-Type': 'application/json',
+        ...(opts.headers || {})
+    };
+    const r = await fetch(SB_URL + '/rest/v1/' + path, {
+        ...opts,
+        headers
     });
     if(!r.ok) {
         const t = await r.text();
@@ -2261,28 +2269,37 @@ async function sbFetch(path, opts={}) {
 }
 
 async function sbGet(table, query='') {
-    return sbFetch(table+'?'+query);
+    return sbFetch(table + '?' + query);
 }
 
 async function sbInsert(table, data) {
-    return sbFetch(table, { method:'POST', body:JSON.stringify(data) });
+    return sbFetch(table, { 
+        method: 'POST', 
+        body: JSON.stringify(data),
+        headers: { Prefer: 'return=representation' }
+    });
 }
 
 async function sbUpdate(table, filter, data) {
-    return sbFetch(table+'?'+filter, { method:'PATCH', body:JSON.stringify(data) });
+    return sbFetch(table + '?' + filter, { 
+        method: 'PATCH', 
+        body: JSON.stringify(data),
+        headers: { Prefer: 'return=representation' }
+    });
 }
 
 async function sbDelete(table, filter) {
-    return sbFetch(table+'?'+filter, { method:'DELETE' });
+    return sbFetch(table + '?' + filter, { method: 'DELETE' });
 }
 
 async function sbUpsert(table, data) {
     return sbFetch(table, {
-        method:'POST',
-        body:JSON.stringify(data),
-        headers: { Prefer:'resolution=merge-duplicates,return=representation' }
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: { Prefer: 'resolution=merge-duplicates,return=representation' }
     });
 }
+
 // ═══════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════
@@ -2353,9 +2370,8 @@ async function setSetting(key, value){
 }
 
 function applySettings(){
-  const hdr = document.getElementById('site-header');
   const hdrBg = document.getElementById('header-bg');
-  const bgUrl = getSetting('header_bg') || 'input_file_0.jpeg'; // по умолчанию
+  const bgUrl = getSetting('header_bg') || '';
   
   if(bgUrl){ hdrBg.style.backgroundImage=`url(${bgUrl})`; }
   else { hdrBg.style.backgroundImage='none'; }
@@ -2365,6 +2381,8 @@ function applySettings(){
 
   const sub = getSetting('header_sub','FESTIVAL STREET-ART & URBAN CULTURE');
   document.getElementById('header-sub-text').textContent = sub;
+  
+  updateTechWorkUI();
 }
 
 // ═══════════════════════════════════════════
@@ -2388,14 +2406,7 @@ function startTicketSlideshow() {
     bgs = [
       'input_file_0.jpeg',
       'input_file_1.jpeg',
-      'input_file_2.jpeg',
-      'input_file_3.jpeg',
-      'input_file_4.jpeg',
-      'input_file_6.jpeg',
-      'input_file_7.jpeg',
-      'input_file_9.jpeg',
-      'input_file_10.jpeg',
-      'input_file_11.jpeg'
+      'input_file_2.jpeg'
     ];
   }
   
@@ -2468,7 +2479,7 @@ function formatLabel(name){
 }
 
 // ═══════════════════════════════════════════
-// CARD
+// CARD BUILDER
 // ═══════════════════════════════════════════
 function buildSection(name, prods){
   const wrap = document.createElement('div');
@@ -2571,7 +2582,7 @@ function buildCard(p){
 }
 
 // ═══════════════════════════════════════════
-// CART
+// CART LOGIC
 // ═══════════════════════════════════════════
 function addToCart(id, size){
   const p = products.find(x=>x.id===id);
@@ -2656,7 +2667,7 @@ function toggleCart(){
 document.getElementById('cart-btn').onclick = toggleCart;
 
 // ═══════════════════════════════════════════
-// PRODUCT MODAL (DETAILED OPEN CARD)
+// PRODUCT MODAL
 // ═══════════════════════════════════════════
 function openPM(id){
   const p = products.find(x=>x.id===id);
@@ -2706,7 +2717,7 @@ function openPM(id){
         cont.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('sel'));
         btn.classList.add('sel');
         document.getElementById('pm-size-err').style.display='none';
-        showToast(`Выбран размер ${btn.dataset.pmsize} (в наличии: ${btn.dataset.qty} шт.)`);
+        showToast(`Выбран размер ${btn.dataset.pmsize}`);
       };
     });
   } else {
@@ -2733,7 +2744,6 @@ function openPM(id){
   document.getElementById('product-modal').classList.add('open');
 }
 
-// FULLSCREEN ZOOM / LIGHTBOX EVENT HANDLERS
 document.getElementById('pm-main-img').onclick = () => {
   const src = document.getElementById('pm-main-img').src;
   if (!src) return;
@@ -2767,18 +2777,75 @@ function pmNav(d){
 }
 
 // ═══════════════════════════════════════════
-// CHECKOUT & TEXT OVERLAY LOGIC
+// CLIPBOARD & TECHNICAL MAINTENANCE LOGIC
 // ═══════════════════════════════════════════
+function copyToClipboard(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+    return Promise.resolve();
+  }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+  } catch (e) {
+    console.warn('Fallback copy failed', e);
+  }
+  document.body.removeChild(ta);
+}
+
+function resetCheckoutFormUI() {
+  const box = document.getElementById('co-box-content');
+  if(!box) return;
+  box.innerHTML = `
+    <button class="co-close" onclick="closeCheckout()">✕</button>
+    <div class="co-title">Оформление заказа</div>
+    <p class="co-step">1 — Контактные данные</p>
+    <div class="co-field"><label>Имя *</label><input class="co-input" id="co-name" placeholder="Иван Иванов"></div>
+    <div class="co-field"><label>Telegram / Телефон *</label><input class="co-input" id="co-contact" placeholder="@username или +7..."></div>
+    <p class="co-step">2 — Доставка СДЭК (пункт выдачи)</p>
+    <div class="co-field"><label>Город</label><input class="co-input" id="co-city" placeholder="Санкт-Петербург"></div>
+    <div class="co-field"><label>Адрес ПВЗ СДЭК</label><input class="co-input" id="co-address" placeholder="Найдите ближайший ПВЗ на cdek.ru"></div>
+    <div class="co-field"><label>Индекс</label><input class="co-input" id="co-zip" placeholder="190000"></div>
+    <p class="co-step">3 — Промокод</p>
+    <div class="co-promo-row">
+      <input class="co-input" id="co-promo" placeholder="Введите промокод" style="flex:1">
+      <button class="co-promo-apply" onclick="applyPromo()">Применить</button>
+    </div>
+    <div class="co-promo-msg" id="co-promo-msg"></div>
+    <p class="co-step">4 — Комментарий</p>
+    <div class="co-field"><textarea class="co-input" id="co-comment" style="min-height:60px;resize:vertical" placeholder="Пожелания, уточнения..."></textarea></div>
+    <div class="co-summary" id="co-summary"></div>
+    <button class="co-submit" id="co-submit" onclick="submitOrder()">Подтвердить заказ →</button>
+  `;
+}
+
 function openCheckout(){
   document.getElementById('cart-drawer').classList.remove('open');
-  activePromo=null;
+  activePromo = null;
+  
+  if (getSetting('text_checkout_enabled') === 'true') {
+    handleTechWorkCheckout();
+    return;
+  }
+  
+  resetCheckoutFormUI();
   ['co-name','co-contact','co-city','co-address','co-zip','co-comment','co-promo'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('co-promo-msg').textContent='';
-  document.getElementById('co-promo-msg').style.color='';
   renderCoSummary();
   document.getElementById('checkout-modal').classList.add('open');
 }
-function closeCheckout(){ document.getElementById('checkout-modal').classList.open; }
+
+function closeCheckout(){ document.getElementById('checkout-modal').classList.remove('open'); }
 document.getElementById('checkout-modal').onclick = e=>{ if(e.target===document.getElementById('checkout-modal')) closeCheckout(); };
 
 function applyPromo(){
@@ -2794,6 +2861,7 @@ function applyPromo(){
 
 function renderCoSummary(){
   const sum = document.getElementById('co-summary');
+  if(!sum) return;
   if(!cart.length){ sum.innerHTML='<div style="opacity:.4">Корзина пуста</div>'; return; }
   let total=0, rows='';
   cart.forEach(ci=>{
@@ -2807,83 +2875,85 @@ function renderCoSummary(){
   sum.innerHTML=rows+discRow+`<div class="co-summary-total"><span>Итого</span><span>${finalTotal.toLocaleString('ru-RU')} ₽</span></div>`;
 }
 
-// Покупка через текст (технические работы)
-function showTextCheckoutModal(clipboardText) {
-  navigator.clipboard.writeText(clipboardText).then(() => {
-    showToast('Данные заказа скопированы! ✓');
-  }).catch(() => {
-    showToast('Пожалуйста, выделите и скопируйте текст вручную');
-  });
+// Отображение модального окна Технических работ с автоматическим копированием
+function handleTechWorkCheckout(custName = '', custContact = '', custCity = '', custAddress = '', custZip = '', custComment = '') {
+  if (!cart.length) {
+    showToast('Корзина пуста');
+    return;
+  }
 
-  const box = document.querySelector('#checkout-modal .co-box');
+  let itemsText = cart.map(ci => {
+    const p = products.find(x => x.id === ci.id);
+    return p ? `- ${p.name} ${ci.size ? '['+ci.size+']' : ''} x ${ci.qty || 1} (${p.price} руб)` : '';
+  }).filter(Boolean).join('\n');
+
+  let totalVal = 0;
+  cart.forEach(ci => {
+    const p = products.find(x => x.id === ci.id);
+    if(p) totalVal += p.price * (ci.qty || 1);
+  });
+  if(activePromo) {
+    totalVal = totalVal - Math.round(totalVal * activePromo.discount / 100);
+  }
+
+  let clipboardText = `🛠 ЗАКАЗ NEVASTICK (Техническая обработка):\n` +
+    (custName ? `Имя: ${custName}\n` : '') +
+    (custContact ? `Контакты: ${custContact}\n` : '') +
+    (custCity || custAddress ? `Доставка: ${custCity} ${custAddress} (${custZip || ''})\n` : '') +
+    (custComment ? `Комментарий: ${custComment}\n` : '') +
+    `\nТовары:\n${itemsText}\n` +
+    `Итого к оплате: ${totalVal.toLocaleString('ru-RU')} ₽`;
+
+  copyToClipboard(clipboardText);
+  showToast('Данные заказа скопированы! ✓');
+
+  const box = document.getElementById('co-box-content');
   if(!box) return;
 
   box.innerHTML = `
     <button class="co-close" onclick="closeCheckout()">✕</button>
-    <div class="co-title" style="color:#000000; font-family:'Archivo Black', sans-serif;">ТЕХНИЧЕСКИЕ РАБОТЫ</div>
-    <p style="font-size:0.75rem; line-height:1.7; margin-bottom:18px; opacity:0.8;">
-      В данный момент на сайте проводятся технические работы. Оформление заказов временно перенесено в наш Telegram саппорт.
+    <div class="co-title" style="color:#ff0000; font-family:'Archivo Black', sans-serif;">ТЕХНИЧЕСКИЕ РАБОТЫ</div>
+    <p style="font-size:0.8rem; line-height:1.6; margin-bottom:16px; font-weight:bold;">
+      На сайте ведутся технические работы.
     </p>
-    <p style="font-size:0.75rem; line-height:1.7; margin-bottom:18px; font-weight:bold; color:var(--fg);">
-      Мы автоматически скопировали все детали вашего заказа в буфер обмена!
+    <p style="font-size:0.75rem; line-height:1.6; margin-bottom:16px; opacity:0.8;">
+      Все детали вашего заказа <strong>автоматически скопированы в буфер обмена</strong>.
     </p>
-    <p style="font-size:0.7rem; line-height:1.7; margin-bottom:24px; opacity:0.6;">
-      Просто нажмите на кнопку ниже, чтобы перейти в диалог с саппортом, и вставьте туда скопированное сообщение (Ctrl+V или долгое нажатие -> Вставить).
+    <p style="font-size:0.7rem; line-height:1.6; margin-bottom:20px; opacity:0.6;">
+      Нажмите на кнопку ниже, перейдите в поддержку Telegram и отправьте скопированное сообщение в чат:
     </p>
     
-    <textarea class="co-input" style="min-height:120px; font-size:0.65rem; margin-bottom:24px; background:var(--bg2);" readonly>${clipboardText}</textarea>
+    <textarea class="co-input" style="min-height:100px; font-size:0.65rem; margin-bottom:20px; background:var(--bg2);" readonly>${clipboardText}</textarea>
     
-    <a href="https://t.me/NEVASTICKERBURG" target="_blank" class="co-submit" style="display:block; text-align:center; padding:18px; text-decoration:none;" onclick="closeCheckout()">
-      НАПИСАТЬ В TELEGRAM →
+    <a href="https://t.me/NEVASTICKERBURG" target="_blank" class="co-submit" style="display:block; text-align:center; padding:18px; text-decoration:none; margin-bottom:10px;" onclick="closeCheckout()">
+      НАПИСАТЬ В TELEGRAM (https://t.me/NEVASTICKERBURG) →
     </a>
+    
+    <button class="admin-btn secondary" style="width:100%; font-size:0.65rem;" onclick="copyToClipboard('${clipboardText.replace(/\n/g, '\\n')}'); showToast('Скопировано повторно!');">
+      Скопировать текст повторно
+    </button>
   `;
+
+  document.getElementById('checkout-modal').classList.add('open');
 }
 
 async function submitOrder(){
-  const name=document.getElementById('co-name').value.trim();
-  const contact=document.getElementById('co-contact').value.trim();
-  if(!name||!contact){ showToast('Заполните имя и контакт'); return; }
-  if(!cart.length){ showToast('Корзина пуста'); return; }
-
-  const textCheckoutEnabled = getSetting('text_checkout_enabled') === 'true';
-
-  if (textCheckoutEnabled) {
-    let itemsText = cart.map(ci => {
-      const p = products.find(x => x.id === ci.id);
-      return p ? `- ${p.name} ${ci.size ? '['+ci.size+']' : ''} x ${ci.qty || 1} (${p.price} руб)` : '';
-    }).filter(Boolean).join('\n');
-
-    let totalVal = 0;
-    cart.forEach(ci => {
-      const p = products.find(x => x.id === ci.id);
-      if(p) totalVal += p.price * (ci.qty || 1);
-    });
-    if(activePromo) {
-      totalVal = totalVal - Math.round(totalVal * activePromo.discount / 100);
-    }
-
-    const city = document.getElementById('co-city').value.trim();
-    const address = document.getElementById('co-address').value.trim();
-    const zip = document.getElementById('co-zip').value.trim();
-    const comment = document.getElementById('co-comment').value.trim();
-    const promo = document.getElementById('co-promo').value.trim();
-
-    let clipboardText = `Заказ NEVASTICK:\n` +
-      `Имя: ${name}\n` +
-      `Контакты: ${contact}\n` +
-      `Доставка: ${city || 'не указан'}, ${address || 'не указан'} (${zip || 'нет'})\n` +
-      `Промокод: ${promo || 'нет'}\n` +
-      `Комментарий: ${comment || 'нет'}\n\n` +
-      `Товары:\n${itemsText}\n` +
-      `Итого к оплате: ${totalVal} руб.`;
-
-    cart = [];
-    saveCart();
-    updateCartUI();
+  if (getSetting('text_checkout_enabled') === 'true') {
+    const name = document.getElementById('co-name') ? document.getElementById('co-name').value.trim() : '';
+    const contact = document.getElementById('co-contact') ? document.getElementById('co-contact').value.trim() : '';
+    const city = document.getElementById('co-city') ? document.getElementById('co-city').value.trim() : '';
+    const address = document.getElementById('co-address') ? document.getElementById('co-address').value.trim() : '';
+    const zip = document.getElementById('co-zip') ? document.getElementById('co-zip').value.trim() : '';
+    const comment = document.getElementById('co-comment') ? document.getElementById('co-comment').value.trim() : '';
     
-    showTextCheckoutModal(clipboardText);
+    handleTechWorkCheckout(name, contact, city, address, zip, comment);
     return;
   }
+
+  const name = document.getElementById('co-name').value.trim();
+  const contact = document.getElementById('co-contact').value.trim();
+  if(!name||!contact){ showToast('Заполните имя и контакт'); return; }
+  if(!cart.length){ showToast('Корзина пуста'); return; }
 
   const btn=document.getElementById('co-submit');
   btn.disabled=true; btn.textContent='Отправляем...';
@@ -2904,7 +2974,8 @@ async function submitOrder(){
   };
 
   try{
-    const [saved]=await sbInsert('orders',order);
+    const res = await sbInsert('orders', order);
+    const saved = Array.isArray(res) ? res[0] : res;
     const localOrders = JSON.parse(localStorage.getItem('neva_orders')||'[]');
     localOrders.unshift({...saved, items});
     localStorage.setItem('neva_orders', JSON.stringify(localOrders));
@@ -2938,9 +3009,11 @@ async function openOrdersPanel(){
 
   let liveStatuses = {};
   try {
-    const ids = localOrders.map(o=>o.id).join(',');
-    const fresh = await sbGet('orders', `id=in.(${ids})&select=id,status`) || [];
-    fresh.forEach(o=>{ liveStatuses[o.id]=o.status; });
+    const ids = localOrders.map(o=>o.id).filter(Boolean).join(',');
+    if(ids) {
+      const fresh = await sbGet('orders', `id=in.(${ids})&select=id,status`) || [];
+      fresh.forEach(o=>{ liveStatuses[o.id]=o.status; });
+    }
   } catch(e){ }
 
   list.innerHTML='';
@@ -2977,7 +3050,7 @@ function doLike(id){
 }
 function doShare(id){
   const url=window.location.href.split('?')[0]+'?item='+id;
-  navigator.clipboard.writeText(url).catch(()=>{});
+  copyToClipboard(url);
   showToast('Ссылка скопирована');
 }
 
@@ -3027,6 +3100,35 @@ function checkPw(){
 }
 
 // ═══════════════════════════════════════════
+// TECH WORKS TOGGLE
+// ═══════════════════════════════════════════
+async function toggleTechWorkMode() {
+  const current = getSetting('text_checkout_enabled') === 'true';
+  const next = !current;
+  await setSetting('text_checkout_enabled', next ? 'true' : 'false');
+  updateTechWorkUI();
+  showToast(next ? 'Режим ТЕХ. РАБОТ включен' : 'Режим ТЕХ. РАБОТ выключен');
+}
+
+async function toggleTechWorkModeFromCheckbox(val) {
+  await setSetting('text_checkout_enabled', val ? 'true' : 'false');
+  updateTechWorkUI();
+  showToast(val ? 'Режим ТЕХ. РАБОТ включен' : 'Режим ТЕХ. РАБОТ выключен');
+}
+
+function updateTechWorkUI() {
+  const isTech = getSetting('text_checkout_enabled') === 'true';
+  const btn = document.getElementById('tech-work-toggle-btn');
+  const chk = document.getElementById('design-text-checkout');
+  if(btn) {
+    btn.textContent = isTech ? 'ВКЛЮЧЕН (Выключить)' : 'ВЫКЛЮЧЕН (Включить)';
+    btn.style.background = isTech ? '#ff0000' : '#000000';
+    btn.style.color = '#ffffff';
+  }
+  if(chk) chk.checked = isTech;
+}
+
+// ═══════════════════════════════════════════
 // ADMIN PANEL
 // ═══════════════════════════════════════════
 function openAdmin(){
@@ -3044,8 +3146,7 @@ function openAdmin(){
   } catch(e) {}
   adminTicketBgs = storedBgs;
   renderAdminTicketBgs();
-
-  document.getElementById('design-text-checkout').checked = getSetting('text_checkout_enabled') === 'true';
+  updateTechWorkUI();
 }
 function closeAdmin(){ document.getElementById('admin-modal').classList.remove('open'); }
 
@@ -3061,8 +3162,8 @@ function updateOrdersBadge(){
   badge.textContent=count; badge.style.display=count>0?'inline':'none';
 }
 
-// ── PRODUCTS ──
-let pfPhotos=[], pfSizes={};
+// ── PRODUCTS EDITING & ADDING ──
+let pfPhotos = [], pfSizes = {};
 
 function renderAdminProducts(){
   const list=document.getElementById('admin-products-list');
@@ -3081,42 +3182,69 @@ function renderAdminProducts(){
   };
 }
 
+async function deleteProduct(id){
+  if(!confirm('Удалить этот товар?')) return;
+  try{
+    await sbDelete('products', `id=eq.${id}`);
+    products = products.filter(p => p.id !== id);
+    renderSite();
+    renderAdminProducts();
+    showToast('Товар удалён');
+  } catch(e){
+    console.error(e);
+    showToast('Ошибка удаления: ' + e.message);
+  }
+}
+
 function populateSectionSel(selId){
   const sel=document.getElementById('pf-section');
   sel.innerHTML='<option value="">— Без раздела —</option>';
   sections.forEach(s=>{ const o=document.createElement('option'); o.value=s.id; o.textContent=s.name; if(s.id===selId) o.selected=true; sel.appendChild(o); });
 }
+
 function openProductForm(id) {
-    const p = id ? products.find(x => x.id === id) : null;
-    //  БЕЗОПАСНОЕ КОПИРОВАНИЕ
-    pfPhotos = p && p.imgs ? Array.from(p.imgs) : [];
-    pfSizes = p && p.sizes ? { ...p.sizes } : {};
-  document.getElementById('pf-edit-id').value=id||'';
-  document.getElementById('pf-title').textContent=id?'Редактировать':'Новый товар';
-  document.getElementById('pf-name').value=p?p.name:'';
-  document.getElementById('pf-price').value=p?p.price:'';
-  document.getElementById('pf-cat').value=p?p.cat:'';
-  document.getElementById('pf-desc').value=p?p.desc||'':'';
-  document.getElementById('pf-badge').value=p?p.badge||'':'';
-  document.getElementById('pf-new-size').value='';
-  populateSectionSel(p?p.section_id||'':'');
-  renderPfPhotos(); renderPfSizes();
-  document.getElementById('product-form').style.display='block';
-  document.getElementById('product-form').scrollIntoView({behavior:'smooth'});
+  const p = id ? products.find(x => x.id === id) : null;
+  pfPhotos = p && p.imgs ? Array.from(p.imgs) : [];
+  pfSizes = p && p.sizes ? { ...p.sizes } : {};
+
+  document.getElementById('pf-edit-id').value = id || '';
+  document.getElementById('pf-title').textContent = id ? 'Редактировать товар' : 'Новый товар';
+  document.getElementById('pf-name').value = p ? p.name : '';
+  document.getElementById('pf-price').value = p ? p.price : '';
+  document.getElementById('pf-cat').value = p ? p.cat || '' : '';
+  document.getElementById('pf-desc').value = p ? p.desc || '' : '';
+  document.getElementById('pf-badge').value = p ? p.badge || '' : '';
+  document.getElementById('pf-new-size').value = '';
+  populateSectionSel(p ? p.section_id || '' : '');
+  
+  renderPfPhotos(); 
+  renderPfSizes();
+  
+  document.getElementById('product-form').style.display = 'block';
+  document.getElementById('product-form').scrollIntoView({behavior: 'smooth'});
 }
+
 function cancelProductForm(){ document.getElementById('product-form').style.display='none'; }
 
-function compressImage(file, maxDim = 1400, quality = 0.75){
-  return new Promise((resolve, reject)=>{
+function compressImage(file, maxDim = 1000, quality = 0.7) {
+  return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = e => {
       const img = new Image();
       img.onload = () => {
         let { width, height } = img;
-        if (width > height && width > maxDim){ height = Math.round(height * (maxDim/width)); width = maxDim; }
-        else if (height > maxDim){ width = Math.round(width * (maxDim/height)); height = maxDim; }
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
         const canvas = document.createElement('canvas');
-        canvas.width = width; canvas.height = height;
+        canvas.width = width;
+        canvas.height = height;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, height);
         resolve(canvas.toDataURL('image/jpeg', quality));
@@ -3130,66 +3258,53 @@ function compressImage(file, maxDim = 1400, quality = 0.75){
 }
 
 async function pfAddImages(input) {
-    //  БЕЗОПАСНАЯ инициализация
-    if (!pfPhotos || !Array.isArray(pfPhotos)) {
-        pfPhotos = [];
+  if (!Array.isArray(pfPhotos)) pfPhotos = [];
+  const files = Array.from(input.files);
+  for (const f of files) {
+    try {
+      const compressed = await compressImage(f);
+      pfPhotos.push(compressed);
+    } catch (err) {
+      console.warn('Ошибка сжатия:', err);
     }
-    const files = Array.from(input.files);
-    for (const f of files) {
-        try {
-            const compressed = await compressImage(f);
-            pfPhotos.push(compressed);
-            renderPfPhotos();
-        } catch (err) {
-            console.warn('Ошибка сжатия:', err);
-            // Если сжатие не работает, используем оригинал
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                pfPhotos.push(e.target.result);
-                renderPfPhotos();
-            };
-            reader.readAsDataURL(f);
-        }
-    }
-    input.value = '';
+  }
+  renderPfPhotos();
+  input.value = '';
 }
+
 function renderPfPhotos() {
-    const g = document.getElementById('pf-photos-grid');
-    if (!g) return;
-    g.innerHTML = '';
-    //  БЕЗОПАСНАЯ проверка
-    if (!pfPhotos || !Array.isArray(pfPhotos)) {
-        pfPhotos = [];
-        return;
+  const g = document.getElementById('pf-photos-grid');
+  if (!g) return;
+  g.innerHTML = '';
+  if (!Array.isArray(pfPhotos)) pfPhotos = [];
+
+  pfPhotos.forEach((img, idx) => {
+    const w = document.createElement('div');
+    w.className = 'admin-photo-thumb';
+    w.innerHTML = `<img src="${img}" alt=""><button class="admin-photo-del" data-idx="${idx}">✕</button>`;
+    g.appendChild(w);
+  });
+  
+  g.onclick = (e) => {
+    const b = e.target.closest('[data-idx]');
+    if (b) {
+      const idx = parseInt(b.dataset.idx);
+      pfPhotos.splice(idx, 1);
+      renderPfPhotos();
     }
-    pfPhotos.forEach((img, idx) => {
-        const w = document.createElement('div');
-        w.className = 'admin-photo-thumb';
-        w.innerHTML = `<img src="${img}" alt=""><button class="admin-photo-del" data-idx="${idx}">✕</button>`;
-        g.appendChild(w);
-    });
-    // Обработчик удаления
-    g.onclick = (e) => {
-        const b = e.target.closest('[data-idx]');
-        if (b) {
-            const idx = parseInt(b.dataset.idx);
-            pfPhotos.splice(idx, 1);
-            renderPfPhotos();
-        }
-    };
+  };
 }
+
 function pfAddSize() {
-    //  БЕЗОПАСНАЯ проверка
-    if (!pfSizes || typeof pfSizes !== 'object') {
-        pfSizes = {};
-    }
-    const sz = document.getElementById('pf-new-size').value.trim().toUpperCase();
-    if (!sz) { showToast('Введите размер'); return; }
-    if (pfSizes.hasOwnProperty(sz)) { showToast('Такой размер уже есть'); return; }
-    pfSizes[sz] = 0;
-    document.getElementById('pf-new-size').value = '';
-    renderPfSizes();
+  if (!pfSizes || typeof pfSizes !== 'object') pfSizes = {};
+  const sz = document.getElementById('pf-new-size').value.trim().toUpperCase();
+  if (!sz) { showToast('Введите размер'); return; }
+  if (pfSizes.hasOwnProperty(sz)) { showToast('Такой размер уже есть'); return; }
+  pfSizes[sz] = 0;
+  document.getElementById('pf-new-size').value = '';
+  renderPfSizes();
 }
+
 function renderPfSizes(){
   const g=document.getElementById('pf-sizes-grid'); g.innerHTML='';
   const entries=Object.entries(pfSizes);
@@ -3202,55 +3317,55 @@ function renderPfSizes(){
   g.oninput=e=>{ const inp=e.target.closest('[data-sz]'); if(inp) pfSizes[inp.dataset.sz]=parseInt(inp.value)||0; };
   g.onclick=e=>{ const b=e.target.closest('[data-delsz]'); if(b){ delete pfSizes[b.dataset.delsz]; renderPfSizes(); } };
 }
+
 async function saveProduct() {
-    const id = document.getElementById('pf-edit-id').value;
-    const name = document.getElementById('pf-name').value.trim().toUpperCase() || 'ТОВАР';
-    const price = parseInt(document.getElementById('pf-price').value) || 0;
-    const cat = document.getElementById('pf-cat').value.trim();
-    const section_id = document.getElementById('pf-section').value || null;
-    const desc = document.getElementById('pf-desc').value.trim();
-    const badge = document.getElementById('pf-badge').value.trim().toUpperCase();
+  const id = document.getElementById('pf-edit-id').value;
+  const name = document.getElementById('pf-name').value.trim().toUpperCase() || 'ТОВАР';
+  const price = parseInt(document.getElementById('pf-price').value) || 0;
+  const cat = document.getElementById('pf-cat').value.trim();
+  const section_id = document.getElementById('pf-section').value || null;
+  const desc = document.getElementById('pf-desc').value.trim();
+  const badge = document.getElementById('pf-badge').value.trim().toUpperCase();
 
-    //  ГЛАВНОЕ ИСПРАВЛЕНИЕ - БЕЗОПАСНОЕ КОПИРОВАНИЕ
-    let imgs = [];
-    if (pfPhotos && pfPhotos.length !== undefined) {
-        imgs = Array.from(pfPhotos);  // <-- КЛЮЧЕВОЕ ИЗМЕНЕНИЕ!
+  const imgs = Array.isArray(pfPhotos) ? [...pfPhotos] : [];
+  const sizes = (pfSizes && typeof pfSizes === 'object') ? {...pfSizes} : {};
+
+  const data = {
+    name,
+    price,
+    cat,
+    section_id,
+    desc,
+    badge,
+    imgs,
+    sizes
+  };
+
+  try {
+    if (id) {
+      const res = await sbUpdate('products', `id=eq.${id}`, data);
+      const updated = Array.isArray(res) ? res[0] : res;
+      const idx = products.findIndex(x => x.id === id);
+      if (idx >= 0) products[idx] = { ...products[idx], ...(updated || data) };
+    } else {
+      const res = await sbInsert('products', data);
+      const created = Array.isArray(res) ? res[0] : res;
+      if (created) {
+        products.push(created);
+      } else {
+        products.push({ id: 'p_' + Date.now(), ...data });
+      }
     }
-
-    let sizes = {};
-    if (pfSizes && typeof pfSizes === 'object') {
-        sizes = { ...pfSizes };
-    }
-
-    const data = {
-        name,
-        price,
-        cat,
-        section_id,
-        description: desc,
-        badge,
-        imgs: imgs,
-        sizes: sizes
-    };
-
-    try {
-        if (id) {
-            const [updated] = await sbUpdate('products', `id=eq.${id}`, data);
-            const idx = products.findIndex(x => x.id === id);
-            if (idx >= 0) products[idx] = { ...products[idx], ...updated };
-        } else {
-            const [created] = await sbInsert('products', data);
-            products.push(created);
-        }
-        renderSite();
-        renderAdminProducts();
-        cancelProductForm();
-        showToast('Сохранено');
-    } catch (e) {
-        console.error(e);
-        showToast('Ошибка сохранения: ' + e.message);
-    }
+    renderSite();
+    renderAdminProducts();
+    cancelProductForm();
+    showToast('Товар сохранён ✓');
+  } catch (e) {
+    console.error('Save product error:', e);
+    showToast('Ошибка сохранения: ' + (e.message || e));
+  }
 }
+
 // ── SECTIONS ──
 function renderAdminSections(){
   const list=document.getElementById('admin-sections-list'); list.innerHTML='';
@@ -3266,8 +3381,9 @@ async function addSection(){
   const name=document.getElementById('sec-name').value.trim(); if(!name) return;
   const data={name, sort_order:parseInt(document.getElementById('sec-order').value)||0, img_url:document.getElementById('sec-img-data').value||null};
   try{
-    const [created]=await sbInsert('sections',data);
-    sections.push(created);
+    const res = await sbInsert('sections', data);
+    const created = Array.isArray(res) ? res[0] : res;
+    sections.push(created || data);
     renderSite(); renderAdminSections(); populateSectionSel('');
     document.getElementById('sec-name').value=''; document.getElementById('sec-order').value='';
     document.getElementById('sec-img-data').value=''; document.getElementById('sec-img-prev').style.display='none';
@@ -3354,8 +3470,9 @@ async function addPromo(){
   if(discount<1||discount>100){ showToast('Скидка 1–100%'); return; }
   if(promos.find(p=>p.code.toUpperCase()===code)){ showToast('Такой код уже есть'); return; }
   try{
-    const [created]=await sbInsert('promos',{code,discount,active:true});
-    promos.push(created);
+    const res = await sbInsert('promos',{code,discount,active:true});
+    const created = Array.isArray(res) ? res[0] : res;
+    promos.push(created || {code,discount,active:true});
     renderAdminPromos();
     document.getElementById('promo-code').value=''; document.getElementById('promo-discount').value='';
     showToast('Промокод добавлен');
@@ -3388,7 +3505,7 @@ async function adminAddTicketBg(input) {
   const files = Array.from(input.files);
   for (const f of files) {
     try {
-      const compressed = await compressImage(f, 1400, 0.75);
+      const compressed = await compressImage(f, 1000, 0.7);
       adminTicketBgs.push(compressed);
       renderAdminTicketBgs();
     } catch(e) {
@@ -3422,7 +3539,7 @@ async function saveDesignSettings() {
   await setSetting('text_checkout_enabled', textCh);
   await setSetting('ticket_bgs', JSON.stringify(adminTicketBgs));
   
-  showToast('Настройки оформления сохранены');
+  showToast('Настройки сохранены');
   renderSite();
 }
 
@@ -3445,7 +3562,7 @@ async function resetAll(){
 // ── UPLOAD HELPER ──
 function previewImg(input,prevId,dataId){
   const f=input.files[0]; if(!f) return;
-  compressImage(f, 1600, 0.8).then(dataUrl=>{
+  compressImage(f, 1200, 0.75).then(dataUrl=>{
     document.getElementById(dataId).value=dataUrl;
     const p=document.getElementById(prevId); p.src=dataUrl; p.style.display='block';
   }).catch(()=>{
