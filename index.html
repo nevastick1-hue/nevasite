@@ -3086,11 +3086,10 @@ function populateSectionSel(selId){
   sel.innerHTML='<option value="">— Без раздела —</option>';
   sections.forEach(s=>{ const o=document.createElement('option'); o.value=s.id; o.textContent=s.name; if(s.id===selId) o.selected=true; sel.appendChild(o); });
 }
-
 function openProductForm(id) {
     const p = id ? products.find(x => x.id === id) : null;
-    //  БЕЗОПАСНОЕ копирование
-    pfPhotos = p && p.imgs && Array.isArray(p.imgs) ? [...p.imgs] : [];
+    //  БЕЗОПАСНОЕ КОПИРОВАНИЕ
+    pfPhotos = p && p.imgs ? Array.from(p.imgs) : [];
     pfSizes = p && p.sizes ? { ...p.sizes } : {};
   document.getElementById('pf-edit-id').value=id||'';
   document.getElementById('pf-title').textContent=id?'Редактировать':'Новый товар';
@@ -3212,24 +3211,24 @@ async function saveProduct() {
     const desc = document.getElementById('pf-desc').value.trim();
     const badge = document.getElementById('pf-badge').value.trim().toUpperCase();
 
-    // ************ ИСПРАВЛЕНИЕ ТУТ ************
-    // Теперь массив берется максимально безопасно
+    //  ГЛАВНОЕ ИСПРАВЛЕНИЕ - БЕЗОПАСНОЕ КОПИРОВАНИЕ
     let imgs = [];
-    if (pfPhotos && typeof pfPhotos === 'object' && pfPhotos.length !== undefined) {
-        // Если это массивоподобный объект, превращаем его в массив
-        imgs = Array.from(pfPhotos);
-    } else {
-        imgs = [];
+    if (pfPhotos && pfPhotos.length !== undefined) {
+        imgs = Array.from(pfPhotos);  // <-- КЛЮЧЕВОЕ ИЗМЕНЕНИЕ!
     }
 
     let sizes = {};
     if (pfSizes && typeof pfSizes === 'object') {
         sizes = { ...pfSizes };
     }
-    // ****************************************
 
     const data = {
-        name, price, cat, section_id, description: desc, badge,
+        name,
+        price,
+        cat,
+        section_id,
+        description: desc,
+        badge,
         imgs: imgs,
         sizes: sizes
     };
