@@ -3087,10 +3087,11 @@ function populateSectionSel(selId){
   sections.forEach(s=>{ const o=document.createElement('option'); o.value=s.id; o.textContent=s.name; if(s.id===selId) o.selected=true; sel.appendChild(o); });
 }
 
-function openProductForm(id){
-  const p=id?products.find(x=>x.id===id):null;
-  pfPhotos=p?[...(p.imgs||[])]:[];
-  pfSizes=p?{...(p.sizes||{})}:{};
+function openProductForm(id) {
+    const p = id ? products.find(x => x.id === id) : null;
+    //  БЕЗОПАСНОЕ копирование
+    pfPhotos = p && p.imgs && Array.isArray(p.imgs) ? [...p.imgs] : [];
+    pfSizes = p && p.sizes ? { ...p.sizes } : {};
   document.getElementById('pf-edit-id').value=id||'';
   document.getElementById('pf-title').textContent=id?'Редактировать':'Новый товар';
   document.getElementById('pf-name').value=p?p.name:'';
@@ -3129,34 +3130,66 @@ function compressImage(file, maxDim = 1400, quality = 0.75){
   });
 }
 
-async function pfAddImages(input){
-  const files=Array.from(input.files);
-  for (const f of files){
-    try{
-      const compressed = await compressImage(f);
-      pfPhotos.push(compressed);
-      renderPfPhotos();
-    }catch(err){
-      console.warn('compression failed, falling back to original', err);
-      const r = new FileReader();
-      r.onload = e => { pfPhotos.push(e.target.result); renderPfPhotos(); };
-      r.readAsDataURL(f);
+async function pfAddImages(input) {
+    //  БЕЗОПАСНАЯ инициализация
+    if (!pfPhotos || !Array.isArray(pfPhotos)) {
+        pfPhotos = [];
     }
-  }
-  input.value='';
+    const files = Array.from(input.files);
+    for (const f of files) {
+        try {
+            const compressed = await compressImage(f);
+            pfPhotos.push(compressed);
+            renderPfPhotos();
+        } catch (err) {
+            console.warn('Ошибка сжатия:', err);
+            // Если сжатие не работает, используем оригинал
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                pfPhotos.push(e.target.result);
+                renderPfPhotos();
+            };
+            reader.readAsDataURL(f);
+        }
+    }
+    input.value = '';
 }
-function renderPfPhotos(){
-  const g=document.getElementById('pf-photos-grid'); g.innerHTML='';
-  pfPhotos.forEach((img,idx)=>{ const w=document.createElement('div'); w.className='admin-photo-thumb'; w.innerHTML=`<img src="${img}" alt=""><button class="admin-photo-del" data-idx="${idx}">✕</button>`; g.appendChild(w); });
-  g.onclick=e=>{ const b=e.target.closest('[data-idx]'); if(b){ pfPhotos.splice(parseInt(b.dataset.idx),1); renderPfPhotos(); } };
+function renderPfPhotos() {
+    const g = document.getElementById('pf-photos-grid');
+    if (!g) return;
+    g.innerHTML = '';
+    //  БЕЗОПАСНАЯ проверка
+    if (!pfPhotos || !Array.isArray(pfPhotos)) {
+        pfPhotos = [];
+        return;
+    }
+    pfPhotos.forEach((img, idx) => {
+        const w = document.createElement('div');
+        w.className = 'admin-photo-thumb';
+        w.innerHTML = `<img src="${img}" alt=""><button class="admin-photo-del" data-idx="${idx}">✕</button>`;
+        g.appendChild(w);
+    });
+    // Обработчик удаления
+    g.onclick = (e) => {
+        const b = e.target.closest('[data-idx]');
+        if (b) {
+            const idx = parseInt(b.dataset.idx);
+            pfPhotos.splice(idx, 1);
+            renderPfPhotos();
+        }
+    };
 }
-
-function pfAddSize(){
-  const sz=document.getElementById('pf-new-size').value.trim().toUpperCase();
-  if(!sz){ showToast('Введите размер'); return; }
-  if(pfSizes.hasOwnProperty(sz)){ showToast('Такой размер уже есть'); return; }
-  pfSizes[sz]=0; document.getElementById('pf-new-size').value='';
-  renderPfSizes();
+function pfAddSize() {
+    //  БЕЗОПАСНАЯ проверка
+    if (!pfSizes || typeof pfSizes !== 'object') {
+        pfSizes = {};
+    }
+    const sz = document.getElementById('pf-new-size').value.trim().toUpperCase();
+    if (!sz) { showToast('Введите размер'); return; }
+    if (pfSizes.hasOwnProperty(sz)) { showToast('Такой размер уже есть'); return; }
+    pfSizes[sz] = 0;
+    document.getElementById('pf-new-size').value = '';
+    renderPfSizes();
 }
 function renderPfSizes(){
   const g=document.getElementById('pf-sizes-grid'); g.innerHTML='';
