@@ -3171,29 +3171,44 @@ function renderPfSizes(){
   g.onclick=e=>{ const b=e.target.closest('[data-delsz]'); if(b){ delete pfSizes[b.dataset.delsz]; renderPfSizes(); } };
 }
 
-async function saveProduct(){
-  const id=document.getElementById('pf-edit-id').value;
-  const data={
-    name:document.getElementById('pf-name').value.trim().toUpperCase()||'ТОВАР',
-    price:parseInt(document.getElementById('pf-price').value)||0,
-    cat:document.getElementById('pf-cat').value.trim(),
-    section_id:document.getElementById('pf-section').value||null,
-    desc:document.getElementById('pf-desc').value.trim(),
-    badge:document.getElementById('pf-badge').value.trim().toUpperCase(),
-    imgs:pfPhotos, sizes:pfSizes
-  };
-  try{
-    if(id){
-      const [updated]=await sbUpdate('products',`id=eq.${id}`,data);
-      const idx=products.findIndex(x=>x.id===id);
-      if(idx>=0) products[idx]={...products[idx],...updated};
-    } else {
-      const [created]=await sbInsert('products',data);
-      products.push(created);
+async function saveProduct() {
+    const id = document.getElementById('pf-edit-id').value;
+    
+    // БЕЗОПАСНОЕ получение данных
+    const name = document.getElementById('pf-name').value.trim().toUpperCase() || 'ТОВАР';
+    const price = parseInt(document.getElementById('pf-price').value) || 0;
+    const cat = document.getElementById('pf-cat').value.trim();
+    const section_id = document.getElementById('pf-section').value || null;
+    const desc = document.getElementById('pf-desc').value.trim();
+    const badge = document.getElementById('pf-badge').value.trim().toUpperCase();
+    
+    // БЕЗОПАСНОЕ копирование массивов
+    const imgs = pfPhotos && Array.isArray(pfPhotos) ? [...pfPhotos] : [];
+    const sizes = pfSizes && typeof pfSizes === 'object' ? {...pfSizes} : {};
+    
+    const data = {
+        name, price, cat, section_id, description: desc, badge,
+        imgs: imgs,
+        sizes: sizes
+    };
+    
+    try {
+        if (id) {
+            const [updated] = await sbUpdate('products', `id=eq.${id}`, data);
+            const idx = products.findIndex(x => x.id === id);
+            if (idx >= 0) products[idx] = {...products[idx], ...updated};
+        } else {
+            const [created] = await sbInsert('products', data);
+            products.push(created);
+        }
+        renderSite();
+        renderAdminProducts();
+        cancelProductForm();
+        showToast('Сохранено');
+    } catch (e) {
+        console.error(e);
+        showToast('Ошибка сохранения: ' + e.message);
     }
-    renderSite(); renderAdminProducts(); cancelProductForm();
-    showToast('Сохранено');
-  } catch(e){ console.error(e); showToast('Ошибка сохранения: '+e.message); }
 }
 
 async function deleteProduct(id){
