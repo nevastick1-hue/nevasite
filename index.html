@@ -3203,7 +3203,6 @@ function renderPfSizes(){
   g.oninput=e=>{ const inp=e.target.closest('[data-sz]'); if(inp) pfSizes[inp.dataset.sz]=parseInt(inp.value)||0; };
   g.onclick=e=>{ const b=e.target.closest('[data-delsz]'); if(b){ delete pfSizes[b.dataset.delsz]; renderPfSizes(); } };
 }
-
 async function saveProduct() {
     const id = document.getElementById('pf-edit-id').value;
     
@@ -3215,12 +3214,25 @@ async function saveProduct() {
     const desc = document.getElementById('pf-desc').value.trim();
     const badge = document.getElementById('pf-badge').value.trim().toUpperCase();
     
-    // БЕЗОПАСНОЕ копирование массивов
-    const imgs = pfPhotos && Array.isArray(pfPhotos) ? [...pfPhotos] : [];
-    const sizes = pfSizes && typeof pfSizes === 'object' ? {...pfSizes} : {};
+    // ГЛАВНОЕ ИСПРАВЛЕНИЕ: БЕЗОПАСНОЕ копирование массива
+    let imgs = [];
+    if (pfPhotos && Array.isArray(pfPhotos)) {
+        imgs = [...pfPhotos];
+    }
+    
+    // БЕЗОПАСНОЕ копирование объекта
+    let sizes = {};
+    if (pfSizes && typeof pfSizes === 'object') {
+        sizes = { ...pfSizes };
+    }
     
     const data = {
-        name, price, cat, section_id, description: desc, badge,
+        name,
+        price,
+        cat,
+        section_id,
+        description: desc,
+        badge,
         imgs: imgs,
         sizes: sizes
     };
@@ -3229,7 +3241,7 @@ async function saveProduct() {
         if (id) {
             const [updated] = await sbUpdate('products', `id=eq.${id}`, data);
             const idx = products.findIndex(x => x.id === id);
-            if (idx >= 0) products[idx] = {...products[idx], ...updated};
+            if (idx >= 0) products[idx] = { ...products[idx], ...updated };
         } else {
             const [created] = await sbInsert('products', data);
             products.push(created);
@@ -3243,7 +3255,6 @@ async function saveProduct() {
         showToast('Ошибка сохранения: ' + e.message);
     }
 }
-
 async function deleteProduct(id){
   if(!confirm('Удалить товар?')) return;
   try{
