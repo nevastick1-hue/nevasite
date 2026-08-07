@@ -2238,38 +2238,51 @@ footer {
 // ═══════════════════════════════════════════
 // SUPABASE CONFIG
 // ═══════════════════════════════════════════
-const SB_URL = 'https://fpgxynmubnpjdxbzvem.supabase.co';
-const SB_KEY = 'sb_publishable_u2nI1hWjERH2c2tvD45U9A_c4iW3j6T';
+// ═══════════════════════════════════════════
+// SUPABASE CONFIG
+const SB_URL = 'https://fpgyunumbnpjdxbzvem.supabase.co';
+const SB_KEY = 'sb_publishable_u2nI1hWjERH2c2tvD4U9A_c4iW3j6T';
 
-async function sbFetch(path, opts={}){
-  const r = await fetch(SB_URL+'/rest/v1/'+path, {
-    headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY,
-      'Content-Type':'application/json', Prefer:'return=representation', ...opts.headers },
-    ...opts
-  });
-  if(!r.ok){ const t=await r.text(); throw new Error(t); }
-  const txt = await r.text();
-  return txt ? JSON.parse(txt) : null;
-}
-
-async function sbGet(table, query=''){
-  return sbFetch(table+'?'+query);
-}
-async function sbInsert(table, data){
-  return sbFetch(table, { method:'POST', body:JSON.stringify(data) });
-}
-async function sbUpdate(table, filter, data){
-  return sbFetch(table+'?'+filter, { method:'PATCH', body:JSON.stringify(data) });
-}
-async function sbDelete(table, filter){
-  return sbFetch(table+'?'+filter, { method:'DELETE' });
-}
-async function sbUpsert(table, data){
-  return sbFetch(table, { method:'POST', body:JSON.stringify(data),
-    headers:{ Prefer:'resolution=merge-duplicates,return=representation',
-      apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' } });
+async function sbFetch(path, opts={}) {
+    const r = await fetch(SB_URL+'/rest/v1/'+path, {
+        headers: {
+            apikey: SB_KEY,
+            Authorization: 'Bearer '+SB_KEY,
+            'Content-Type': 'application/json'
+        },
+        ...opts
+    });
+    if(!r.ok) {
+        const t = await r.text();
+        throw new Error(t);
+    }
+    const txt = await r.text();
+    return txt ? JSON.parse(txt) : null;
 }
 
+async function sbGet(table, query='') {
+    return sbFetch(table+'?'+query);
+}
+
+async function sbInsert(table, data) {
+    return sbFetch(table, { method:'POST', body:JSON.stringify(data) });
+}
+
+async function sbUpdate(table, filter, data) {
+    return sbFetch(table+'?'+filter, { method:'PATCH', body:JSON.stringify(data) });
+}
+
+async function sbDelete(table, filter) {
+    return sbFetch(table+'?'+filter, { method:'DELETE' });
+}
+
+async function sbUpsert(table, data) {
+    return sbFetch(table, {
+        method:'POST',
+        body:JSON.stringify(data),
+        headers: { Prefer:'resolution=merge-duplicates,return=representation' }
+    });
+}
 // ═══════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════
