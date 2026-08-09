@@ -1,4 +1,5 @@
 
+--- START OF FILE index.html ---
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -19,6 +20,7 @@
   --card-bg: #ffffff;
   --border: #000000;
   --dark: #000000;
+  --brand-pink: #fa0055;
 }
 
 *, *::before, *::after {
@@ -39,6 +41,27 @@ body {
   font-family: 'Space Mono', monospace, sans-serif;
   overflow-x: hidden;
   cursor: crosshair;
+}
+
+/* BACKGROUND LOGO */
+.bg-logo-wrapper {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 130vmax;
+  height: 130vmax;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.25;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bg-logo-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 a {
@@ -214,7 +237,7 @@ a {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: var(--bg);
+  background: transparent;
   padding: 120px 0 60px;
 }
 #header-bg {
@@ -337,9 +360,9 @@ a {
   letter-spacing: -0.02em;
 }
 .qtickets-button {
-  background: #ffffff;
+  background: #fa0055;
   border: 3px solid var(--border);
-  color: #000000;
+  color: #ffffff;
   font-family: 'Archivo Black', sans-serif;
   font-weight: 900;
   padding: 16px 36px;
@@ -416,6 +439,8 @@ a {
   padding: 80px 24px;
   max-width: 1400px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 .section-header {
   display: flex;
@@ -1330,6 +1355,8 @@ footer {
   gap: 24px;
   text-align: center;
   background: var(--bg2);
+  position: relative;
+  z-index: 1;
 }
 .footer-logo {
   font-family: 'Archivo Black', sans-serif;
@@ -1920,6 +1947,10 @@ footer {
 </style>
 </head>
 <body>
+
+<div class="bg-logo-wrapper">
+  <img src="Logo.svg" alt="NEVASTICK Logo">
+</div>
 
 <div id="page-loader">
   <div>
