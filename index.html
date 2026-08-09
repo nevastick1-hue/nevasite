@@ -2304,10 +2304,12 @@ async function sbFetch(path, opts={}) {
     try {
         const headers = {
             apikey: SB_KEY,
-            Authorization: 'Bearer ' + SB_KEY,
             'Content-Type': 'application/json',
             ...(opts.headers || {})
         };
+        if (SB_KEY.startsWith('eyJ')) {
+            headers['Authorization'] = 'Bearer ' + SB_KEY;
+        }
         const r = await fetch(SB_URL + '/rest/v1/' + path, {
             ...opts,
             headers,
@@ -2316,12 +2318,14 @@ async function sbFetch(path, opts={}) {
         clearTimeout(timeoutId);
         if(!r.ok) {
             const t = await r.text();
-            throw new Error(t);
+            console.error("Supabase Error:", r.status, t);
+            throw new Error(`[HTTP ${r.status}] ${t}`);
         }
         const txt = await r.text();
         return txt ? JSON.parse(txt) : null;
     } catch(e) {
         clearTimeout(timeoutId);
+        console.error("sbFetch failed:", e);
         throw e;
     }
 }
@@ -2412,7 +2416,10 @@ async function ensureTables(){
     if (pRes.status === 'fulfilled' && Array.isArray(pRes.value)) { 
       products = pRes.value.map(p => ({...p, desc: p.desc || p.description || ''})); 
       saveToCache('products', products); 
+    } else if (pRes.status === 'rejected') {
+      console.error("Products load rejected:", pRes.reason);
     }
+
     if (sRes.status === 'fulfilled' && Array.isArray(sRes.value)) { 
       sections = sRes.value; 
       saveToCache('sections', sections); 
@@ -2554,6 +2561,16 @@ function renderSite(){
 
   const main = document.getElementById('main-content');
   main.innerHTML = '';
+
+  if (products.length === 0) {
+    main.innerHTML = `
+      <div class="products-section" style="text-align:center; padding:60px 20px;">
+        <p style="font-family:'Archivo Black', sans-serif; font-size:1.1rem; opacity:0.5; text-transform:uppercase;">
+          Товары загружаются или отсутствуют
+        </p>
+      </div>`;
+    return;
+  }
 
   const sorted = [...sections].sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
   const assignedIds = new Set();
