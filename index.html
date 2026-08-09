@@ -1,11 +1,18 @@
+Основная причина, почему сайт зависал на мобильных устройствах (МТС, МегаФон,
+Билайн, Tele2, Wi-Fi и VPN) — блокировки и задержки сети при последовательных
+запросах к Supabase без таймаута.
+
+Почему это происходило:
+
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NEVASTICK — FESTIVAL & MERCH</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-<script type="text/javascript" src="https://cdn.qtickets.tech/openapi.js"></script>
+<script type="text/javascript" src="https://cdn.qtickets.tech/openapi.js" defer></script>
 
 <style>
 :root {
@@ -28,12 +35,13 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   background: var(--bg);
   color: var(--fg);
-  font-family: 'Space Mono', monospace;
+  font-family: 'Space Mono', monospace, sans-serif;
   overflow-x: hidden;
   cursor: crosshair;
 }
@@ -147,6 +155,8 @@ a {
   padding: 28px;
   transform: translateX(-100%);
   transition: transform .4s cubic-bezier(.16, 1, .3, 1);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 #menu-overlay.open {
   transform: translateX(0);
@@ -196,12 +206,14 @@ a {
   letter-spacing: .2em;
   text-transform: uppercase;
   color: #f0f0f0;
+  margin-top: 20px;
 }
 
 /* HEADER / HERO */
 #site-header {
   position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -271,6 +283,7 @@ a {
 .marquee-inner {
   display: inline-block;
   animation: marquee 25s linear infinite;
+  will-change: transform;
 }
 .marquee-inner span {
   display: inline-block;
@@ -487,6 +500,7 @@ a {
   height: 8px;
   border: 1px solid #000000;
   background: rgba(255, 255, 255, 0.6);
+  pointer-events: auto;
 }
 .card-dot.active {
   background: #000000;
@@ -520,6 +534,9 @@ a {
 .product-card:hover .card-actions {
   opacity: 1;
   transform: translateX(0);
+}
+@media (max-width: 768px) {
+  .card-actions { opacity: 1; transform: none; }
 }
 .card-action-btn {
   width: 36px;
@@ -644,6 +661,7 @@ a {
   justify-content: center;
   padding: 20px;
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 #product-modal.open {
   display: flex;
@@ -654,6 +672,7 @@ a {
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   display: grid;
   grid-template-columns: 1fr 1fr;
   position: relative;
@@ -922,6 +941,7 @@ a {
 .cart-items {
   flex: 1;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 24px;
 }
 .cart-empty {
@@ -1059,6 +1079,7 @@ a {
   justify-content: center;
   padding: 20px;
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 #checkout-modal.open {
   display: flex;
@@ -1069,6 +1090,7 @@ a {
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 40px;
   position: relative;
   border: 3px solid var(--border);
@@ -1211,6 +1233,7 @@ a {
   justify-content: center;
   padding: 20px;
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 #orders-panel.open {
   display: flex;
@@ -1221,6 +1244,7 @@ a {
   width: 100%;
   max-height: 80vh;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 40px;
   position: relative;
   border: 3px solid var(--border);
@@ -1421,7 +1445,7 @@ footer {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity .4s;
+  transition: opacity .4s ease;
 }
 #page-loader.gone {
   opacity: 0;
@@ -1538,6 +1562,7 @@ footer {
   z-index: 500;
   background: #ffffff;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   display: none;
   color: #000000;
 }
@@ -2081,7 +2106,6 @@ footer {
     <div class="admin-title">Admin Panel</div>
     <p class="admin-sub">Nevastick Merch Store</p>
     
-    <!-- Кнопка быстрого управления тех. работами -->
     <div style="padding:16px; background:#f5f5e8; border:2px solid #000; margin-bottom:28px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
       <div>
         <strong style="font-size:0.8rem; text-transform:uppercase;">Технические работы (Заказ через Telegram):</strong>
@@ -2244,28 +2268,37 @@ footer {
 
 <script>
 // ═══════════════════════════════════════════
-// SUPABASE CONFIG
+// SUPABASE CONFIG & TIMEOUT
 // ═══════════════════════════════════════════
 const SB_URL = 'https://fpgxynmunbpnjdxbzevm.supabase.co';
 const SB_KEY = 'sb_publishable_u2nI1hWjERH2c2tvD45U9A_c4iW3j6T';
 
 async function sbFetch(path, opts={}) {
-    const headers = {
-        apikey: SB_KEY,
-        Authorization: 'Bearer ' + SB_KEY,
-        'Content-Type': 'application/json',
-        ...(opts.headers || {})
-    };
-    const r = await fetch(SB_URL + '/rest/v1/' + path, {
-        ...opts,
-        headers
-    });
-    if(!r.ok) {
-        const t = await r.text();
-        throw new Error(t);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 4000); // 4 сек таймаут
+    try {
+        const headers = {
+            apikey: SB_KEY,
+            Authorization: 'Bearer ' + SB_KEY,
+            'Content-Type': 'application/json',
+            ...(opts.headers || {})
+        };
+        const r = await fetch(SB_URL + '/rest/v1/' + path, {
+            ...opts,
+            headers,
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        if(!r.ok) {
+            const t = await r.text();
+            throw new Error(t);
+        }
+        const txt = await r.text();
+        return txt ? JSON.parse(txt) : null;
+    } catch(e) {
+        clearTimeout(timeoutId);
+        throw e;
     }
-    const txt = await r.text();
-    return txt ? JSON.parse(txt) : null;
 }
 
 async function sbGet(table, query='') {
@@ -2301,7 +2334,7 @@ async function sbUpsert(table, data) {
 }
 
 // ═══════════════════════════════════════════
-// STATE
+// STATE & CACHING
 // ═══════════════════════════════════════════
 let products = [];
 let sections = [];
@@ -2311,8 +2344,20 @@ let settings = {};
 let likes = {};
 let activeFilter = null;
 let pmId = null, pmPhotos = [], pmPhotoIdx = 0;
-let cart = []; // [{cartKey, id, size, qty}]
+let cart = [];
 let activePromo = null;
+
+function loadFromCache() {
+  try {
+    const p = localStorage.getItem('neva_products'); if(p) products = JSON.parse(p);
+    const s = localStorage.getItem('neva_sections'); if(s) sections = JSON.parse(s);
+    const st = localStorage.getItem('neva_settings'); if(st) settings = JSON.parse(st);
+  } catch(e) { console.warn('Cache load:', e); }
+}
+
+function saveToCache(key, val) {
+  try { localStorage.setItem('neva_' + key, JSON.stringify(val)); } catch(e){}
+}
 
 function loadCart(){
   try{ cart = JSON.parse(localStorage.getItem('neva_cart')||'[]'); }
@@ -2328,20 +2373,44 @@ function loadLikes(){
 function saveLikes(){ localStorage.setItem('neva_likes', JSON.stringify(likes)); }
 
 async function ensureTables(){
-  try { products = await sbGet('products','order=created_at.asc') || []; } catch{ products=[]; }
-  try { sections = await sbGet('sections','order=sort_order.asc') || []; } catch{ sections=[]; }
-  try { orders = await sbGet('orders','order=created_at.desc') || []; } catch{ orders=[]; }
-  try { promos = await sbGet('promos','order=created_at.asc') || []; } catch{ promos=[]; }
+  loadFromCache();
+
   try {
-    const rows = await sbGet('settings','select=key,value') || [];
-    settings = {};
-    rows.forEach(r=>settings[r.key]=r.value);
-  } catch{ settings={}; }
+    const [pRes, sRes, oRes, prRes, stRes] = await Promise.allSettled([
+      sbGet('products','order=created_at.asc'),
+      sbGet('sections','order=sort_order.asc'),
+      sbGet('orders','order=created_at.desc'),
+      sbGet('promos','order=created_at.asc'),
+      sbGet('settings','select=key,value')
+    ]);
+
+    if (pRes.status === 'fulfilled' && pRes.value) { products = pRes.value; saveToCache('products', products); }
+    if (sRes.status === 'fulfilled' && sRes.value) { sections = sRes.value; saveToCache('sections', sections); }
+    if (oRes.status === 'fulfilled' && oRes.value) { orders = oRes.value; }
+    if (prRes.status === 'fulfilled' && prRes.value) { promos = prRes.value; }
+    if (stRes.status === 'fulfilled' && stRes.value) {
+      settings = {};
+      stRes.value.forEach(r => settings[r.key] = r.value);
+      saveToCache('settings', settings);
+    }
+  } catch (e) {
+    console.warn("Supabase load error or network timeout:", e);
+  }
 }
 
 // ═══════════════════════════════════════════
-// INIT
+// INIT & GUARANTEED LOADER HIDE
 // ═══════════════════════════════════════════
+function hideLoader() {
+  const loader = document.getElementById('page-loader');
+  if (loader && !loader.classList.contains('gone')) {
+    loader.classList.add('gone');
+  }
+}
+
+// Аварийное скрытие лоадера ровно через 3 секунды в любом случае
+setTimeout(hideLoader, 3000);
+
 async function init(){
   try {
     loadCart(); 
@@ -2354,10 +2423,7 @@ async function init(){
   } catch (e) {
     console.error("Initialization error:", e);
   } finally {
-    const loader = document.getElementById('page-loader');
-    if (loader) {
-      loader.classList.add('gone');
-    }
+    hideLoader();
   }
 }
 
@@ -2875,7 +2941,6 @@ function renderCoSummary(){
   sum.innerHTML=rows+discRow+`<div class="co-summary-total"><span>Итого</span><span>${finalTotal.toLocaleString('ru-RU')} ₽</span></div>`;
 }
 
-// Отображение модального окна Технических работ с автоматическим копированием
 function handleTechWorkCheckout(custName = '', custContact = '', custCity = '', custAddress = '', custZip = '', custComment = '') {
   if (!cart.length) {
     showToast('Корзина пуста');
@@ -3554,6 +3619,9 @@ async function resetAll(){
   products=[]; sections=[]; orders=[]; promos=[]; settings={};
   cart=[]; saveCart();
   localStorage.removeItem('neva_orders');
+  localStorage.removeItem('neva_products');
+  localStorage.removeItem('neva_sections');
+  localStorage.removeItem('neva_settings');
   renderSite(); renderAdminProducts(); renderAdminSections(); renderAdminOrders(); renderAdminPromos();
   updateCartUI(); updateOrdersBadge(); applySettings();
   showToast('Данные сброшены');
@@ -3572,7 +3640,11 @@ function previewImg(input,prevId,dataId){
   });
 }
 
-init();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
 </script>
 </body>
 </html>
