@@ -1,0 +1,64 @@
+[
+  {
+    "id": "p1",
+    "name": "NEVASTICK TEE BLACK",
+    "price": 2500,
+    "cat": "Футболки",
+    "desc": "Прямая шелкография, 100% плотный хлопок 220г/м². Оверсайз крой.",
+    "badge": "HIT",
+    "imgs": ["https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&auto=format&fit=crop&q=60"],
+    "sizes": {
+      "S": 5,
+      "M": 12,
+      "L": 8,
+      "XL": 3
+    }
+  },
+  {
+    "id": "p2",
+    "name": "NEVASTICK HOODIE GRAFFITI",
+    "price": 4800,
+    "cat": "Худи",
+    "desc": "Худи с начесом, объемный вышитый логотип на груди и принт на спине.",
+    "badge": "NEW",
+    "imgs": ["https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&auto=format&fit=crop&q=60"],
+    "sizes": {
+      "M": 6,
+      "L": 10,
+      "XL": 5,
+      "XXL": 2
+    }
+  },
+  {
+    "id": "p3",
+    "name": "STICKER PACK VOL. 4",
+    "price": 600,
+    "cat": "Стикеры",
+    "desc": "Набор из 15 виниловых стикеров от участников фестиваля NEVASTICK. Устойчивы к воде и УФ.",
+    "badge": "BEST",
+    "imgs": ["https://images.unsplash.com/photo-1572375992501-4b0892d50c69?w=800&auto=format&fit=crop&q=60"],
+    "sizes": {}
+  },
+  {
+    "id": "p4",
+    "name": "NEVASTICK CAP SPRAY",
+    "price": 1800,
+    "cat": "Аксессуары",
+    "desc": "Пятипанельная кепка с металлическим фиксатором и рефлективным логотипом.",
+    "badge": "LIMITED",
+    "imgs": ["https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=800&auto=format&fit=crop&q=60"],
+    "sizes": {
+      "ONE SIZE": 15
+    }
+  },
+  {
+    "id": "p5",
+    "name": "TOTE BAG URBAN STREET",
+    "price": 1200,
+    "cat": "Аксессуары",
+    "desc": "Хлопковая сумка-шоппер высокой плотности 320г/м² с внутренним карманом.",
+    "badge": "",
+    "imgs": ["https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=60"],
+    "sizes": {}
+  }
+]

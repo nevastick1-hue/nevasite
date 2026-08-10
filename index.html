@@ -2131,6 +2131,19 @@ footer {
     <div class="admin-title">Admin Panel</div>
     <p class="admin-sub">Nevastick Merch Store</p>
     
+    <div style="padding:16px; background:#fffbe6; border:2px solid #000; margin-bottom:28px;">
+      <strong style="font-size:0.8rem; text-transform:uppercase;">⚙️ Настройки GitHub API (Для автосохранения на GitHub):</strong>
+      <p style="font-size:0.65rem; opacity:0.7; margin:4px 0 12px;">Укажите ваш логин, репозиторий и токен, чтобы админка сохраняла товары прямо на GitHub.</p>
+      <div class="admin-form-row">
+        <div class="admin-field"><label>GitHub Логин (Owner)</label><input class="admin-input" id="gh-owner" placeholder="например: prikazyuk"></div>
+        <div class="admin-field"><label>Репозиторий (Repo)</label><input class="admin-input" id="gh-repo" placeholder="например: nevastick"></div>
+      </div>
+      <div class="admin-form-row full" style="margin-bottom:12px">
+        <div class="admin-field"><label>GitHub Personal Token (ghp_...)</label><input class="admin-input" id="gh-token" type="password" placeholder="ghp_xxxxxxxxxxxxxx"></div>
+      </div>
+      <button class="admin-btn primary sm" onclick="saveGitHubSettings()">Сохранить настройки GitHub</button>
+    </div>
+
     <div style="padding:16px; background:#f5f5e8; border:2px solid #000; margin-bottom:28px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
       <div>
         <strong style="font-size:0.8rem; text-transform:uppercase;">Технические работы (Заказ через Telegram):</strong>
@@ -2180,17 +2193,17 @@ footer {
         </div>
         <div class="admin-form-row full">
           <div class="admin-field">
-            <label>Фотографии (можно загрузить любое количество)</label>
+            <label>Фотографии (можно выбрать прямо из галереи телефона)</label>
             <div class="upload-area" onclick="document.getElementById('pf-img-input').click()">
               <input type="file" id="pf-img-input" accept="image/*" multiple onchange="pfAddImages(this)">
-              <p>Нажмите для загрузки фото</p>
+              <p>Нажмите для выборa фото</p>
             </div>
             <div class="admin-photos-grid" id="pf-photos-grid"></div>
           </div>
         </div>
         <input type="hidden" id="pf-edit-id">
         <div style="display:flex;gap:12px;margin-top:20px">
-          <button class="admin-btn primary" onclick="saveProduct()">Сохранить товар</button>
+          <button class="admin-btn primary" onclick="saveProduct()">Сохранить товар и отправить на GitHub</button>
           <button class="admin-btn secondary" onclick="cancelProductForm()">Отмена</button>
         </div>
       </div>
@@ -2293,73 +2306,107 @@ footer {
 
 <script>
 // ═══════════════════════════════════════════
-// SUPABASE CONFIG & TIMEOUT
+// HELPER FOR UTF-8 BASE64 (GitHub API)
 // ═══════════════════════════════════════════
-const SB_URL = 'https://fpgxynmunbpnjdxbzevm.supabase.co';
-const SB_KEY = 'sb_publishable_u2nI1hWjERH2c2tvD45U9A_c4iW3j6T';
+function utf8ToBase64(str) {
+  const bytes = new TextEncoder().encode(str);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
 
-async function sbFetch(path, opts={}) {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 12000); // 12 сек таймаут
-    try {
-        const headers = {
-            apikey: SB_KEY,
-            'Content-Type': 'application/json',
-            ...(opts.headers || {})
-        };
-        if (SB_KEY.startsWith('eyJ')) {
-            headers['Authorization'] = 'Bearer ' + SB_KEY;
-        }
-        const r = await fetch(SB_URL + '/rest/v1/' + path, {
-            ...opts,
-            headers,
-            signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-        if(!r.ok) {
-            const t = await r.text();
-            console.error("Supabase Error:", r.status, t);
-            throw new Error(`[HTTP ${r.status}] ${t}`);
-        }
-        const txt = await r.text();
-        return txt ? JSON.parse(txt) : null;
-    } catch(e) {
-        clearTimeout(timeoutId);
-        console.error("sbFetch failed:", e);
-        throw e;
+// ═══════════════════════════════════════════
+// GITHUB API FUNCTIONS
+// ═══════════════════════════════════════════
+function saveGitHubSettings() {
+  const owner = document.getElementById('gh-owner').value.trim();
+  const repo = document.getElementById('gh-repo').value.trim();
+  const token = document.getElementById('gh-token').value.trim();
+
+  localStorage.setItem('neva_gh_owner', owner);
+  localStorage.setItem('neva_gh_repo', repo);
+  if(token) localStorage.setItem('neva_gh_token', token);
+
+  showToast('Настройки GitHub сохранены ✓');
+}
+
+function loadGitHubSettingsUI() {
+  const owner = localStorage.getItem('neva_gh_owner') || '';
+  const repo = localStorage.getItem('neva_gh_repo') || '';
+  const token = localStorage.getItem('neva_gh_token') || '';
+
+  const elOwner = document.getElementById('gh-owner');
+  const elRepo = document.getElementById('gh-repo');
+  const elToken = document.getElementById('gh-token');
+
+  if(elOwner) elOwner.value = owner;
+  if(elRepo) elRepo.value = repo;
+  if(elToken) elToken.value = token;
+}
+
+async function syncProductsToGitHub() {
+  const owner = localStorage.getItem('neva_gh_owner') || '';
+  const repo = localStorage.getItem('neva_gh_repo') || '';
+  const token = localStorage.getItem('neva_gh_token') || '';
+
+  if (!owner || !repo || !token) {
+    alert("Заполните настройки GitHub API вверху админ-панели (Логин, Репозиторий и Токен)!");
+    return false;
+  }
+
+  showToast("Сохраняем на GitHub...");
+
+  try {
+    // 1. Получаем SHA текущего файла products.json
+    let sha = null;
+    const getRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/products.json`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+
+    if (getRes.ok) {
+      const fileData = await getRes.json();
+      sha = fileData.sha;
     }
-}
 
-async function sbGet(table, query='') {
-    return sbFetch(table + '?' + query);
-}
+    // 2. Готовим тело запроса
+    const jsonString = JSON.stringify(products, null, 2);
+    const base64Content = utf8ToBase64(jsonString);
 
-async function sbInsert(table, data) {
-    return sbFetch(table, { 
-        method: 'POST', 
-        body: JSON.stringify(data),
-        headers: { Prefer: 'return=representation' }
+    const bodyData = {
+      message: "Обновление товаров через Админку",
+      content: base64Content
+    };
+    if (sha) bodyData.sha = sha;
+
+    // 3. Отправляем новый products.json на GitHub
+    const putRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/products.json`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/vnd.github.v3+json'
+      },
+      body: JSON.stringify(bodyData)
     });
-}
 
-async function sbUpdate(table, filter, data) {
-    return sbFetch(table + '?' + filter, { 
-        method: 'PATCH', 
-        body: JSON.stringify(data),
-        headers: { Prefer: 'return=representation' }
-    });
-}
+    if (!putRes.ok) {
+      const errTxt = await putRes.text();
+      console.error("GitHub Error:", errTxt);
+      throw new Error(`[HTTP ${putRes.status}] ${errTxt}`);
+    }
 
-async function sbDelete(table, filter) {
-    return sbFetch(table + '?' + filter, { method: 'DELETE' });
-}
-
-async function sbUpsert(table, data) {
-    return sbFetch(table, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: { Prefer: 'resolution=merge-duplicates,return=representation' }
-    });
+    showToast("Успешно сохранено на GitHub! ✓");
+    return true;
+  } catch (e) {
+    console.error("syncProductsToGitHub error:", e);
+    alert("Ошибка отправки на GitHub:\n" + e.message);
+    return false;
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -2404,39 +2451,18 @@ function saveLikes(){ localStorage.setItem('neva_likes', JSON.stringify(likes));
 async function ensureTables(){
   loadFromCache();
 
+  // 1. Приоритетная загрузка из файла products.json
   try {
-    const [pRes, sRes, oRes, prRes, stRes] = await Promise.allSettled([
-      sbGet('products','select=*'),
-      sbGet('sections','select=*'),
-      sbGet('orders','select=*'),
-      sbGet('promos','select=*'),
-      sbGet('settings','select=key,value')
-    ]);
-
-    if (pRes.status === 'fulfilled' && Array.isArray(pRes.value)) { 
-      products = pRes.value.map(p => ({...p, desc: p.desc || p.description || ''})); 
-      saveToCache('products', products); 
-    } else if (pRes.status === 'rejected') {
-      console.error("Products load rejected:", pRes.reason);
+    const pJsonRes = await fetch('products.json?v=' + Date.now());
+    if (pJsonRes.ok) {
+      const pJsonData = await pJsonRes.json();
+      if (Array.isArray(pJsonData) && pJsonData.length > 0) {
+        products = pJsonData.map(p => ({...p, desc: p.desc || p.description || ''}));
+        saveToCache('products', products);
+      }
     }
-
-    if (sRes.status === 'fulfilled' && Array.isArray(sRes.value)) { 
-      sections = sRes.value; 
-      saveToCache('sections', sections); 
-    }
-    if (oRes.status === 'fulfilled' && Array.isArray(oRes.value)) { 
-      orders = oRes.value; 
-    }
-    if (prRes.status === 'fulfilled' && Array.isArray(prRes.value)) { 
-      promos = prRes.value; 
-    }
-    if (stRes.status === 'fulfilled' && Array.isArray(stRes.value)) {
-      settings = {};
-      stRes.value.forEach(r => settings[r.key] = r.value);
-      saveToCache('settings', settings);
-    }
-  } catch (e) {
-    console.warn("Supabase load error or network timeout:", e);
+  } catch (errJson) {
+    console.warn("products.json load fail, using cache:", errJson);
   }
 }
 
@@ -2450,7 +2476,6 @@ function hideLoader() {
   }
 }
 
-// Аварийное скрытие лоадера ровно через 3 секунды в любом случае
 setTimeout(hideLoader, 3000);
 
 async function init(){
@@ -2474,7 +2499,7 @@ function getSetting(key, def=''){
 }
 async function setSetting(key, value){
   settings[key] = value;
-  try { await sbUpsert('settings', {key, value}); } catch(e){ console.warn('settings save:', e); }
+  saveToCache('settings', settings);
 }
 
 function applySettings(){
@@ -2664,7 +2689,8 @@ function buildCard(p){
   let imgIdx = 0;
 
   card.addEventListener('click', e=>{
-    const action = e.target.dataset.action || e.target.closest('[data-action]')?.dataset.action;
+    const actionBtn = e.target.closest('[data-action]');
+    const action = e.target.dataset.action || (actionBtn ? actionBtn.dataset.action : null);
     const szBtn = e.target.closest('.card-size-btn');
 
     if(szBtn && !szBtn.disabled){
@@ -3017,7 +3043,7 @@ function handleTechWorkCheckout(custName = '', custContact = '', custCity = '', 
     totalVal = totalVal - Math.round(totalVal * activePromo.discount / 100);
   }
 
-  let clipboardText = `🛠 ЗАКАЗ NEVASTICK (Техническая обработка):\n` +
+  let clipboardText = `🛠 ЗАКАЗ NEVASTICK:\n` +
     (custName ? `Имя: ${custName}\n` : '') +
     (custContact ? `Контакты: ${custContact}\n` : '') +
     (custCity || custAddress ? `Доставка: ${custCity} ${custAddress} (${custZip || ''})\n` : '') +
@@ -3059,60 +3085,14 @@ function handleTechWorkCheckout(custName = '', custContact = '', custCity = '', 
 }
 
 async function submitOrder(){
-  if (getSetting('text_checkout_enabled') === 'true') {
-    const name = document.getElementById('co-name') ? document.getElementById('co-name').value.trim() : '';
-    const contact = document.getElementById('co-contact') ? document.getElementById('co-contact').value.trim() : '';
-    const city = document.getElementById('co-city') ? document.getElementById('co-city').value.trim() : '';
-    const address = document.getElementById('co-address') ? document.getElementById('co-address').value.trim() : '';
-    const zip = document.getElementById('co-zip') ? document.getElementById('co-zip').value.trim() : '';
-    const comment = document.getElementById('co-comment') ? document.getElementById('co-comment').value.trim() : '';
-    
-    handleTechWorkCheckout(name, contact, city, address, zip, comment);
-    return;
-  }
-
-  const name = document.getElementById('co-name').value.trim();
-  const contact = document.getElementById('co-contact').value.trim();
-  if(!name||!contact){ showToast('Заполните имя и контакт'); return; }
-  if(!cart.length){ showToast('Корзина пуста'); return; }
-
-  const btn=document.getElementById('co-submit');
-  btn.disabled=true; btn.textContent='Отправляем...';
-
-  const items=cart.map(ci=>{ const p=products.find(x=>x.id===ci.id); return p?{id:ci.id,name:p.name+(ci.size?' / '+ci.size:''),price:p.price,qty:ci.qty||1,size:ci.size||null}:null; }).filter(Boolean);
-  const rawTotal=items.reduce((s,i)=>s+i.price*i.qty,0);
-  const discount=activePromo?Math.round(rawTotal*activePromo.discount/100):0;
-  const total=rawTotal-discount;
-  const fullAddress=[document.getElementById('co-city').value.trim(),document.getElementById('co-address').value.trim(),document.getElementById('co-zip').value.trim()].filter(Boolean).join(', ');
-
-  const order={
-    customer_name:name, contact, address:fullAddress,
-    delivery:'СДЭК — пункт выдачи',
-    comment:document.getElementById('co-comment').value.trim(),
-    promo_code:activePromo?activePromo.code:'',
-    discount, raw_total:rawTotal, total,
-    items:JSON.stringify(items), status:'pending'
-  };
-
-  try{
-    const res = await sbInsert('orders', order);
-    const saved = Array.isArray(res) ? res[0] : res;
-    const localOrders = JSON.parse(localStorage.getItem('neva_orders')||'[]');
-    localOrders.unshift({...saved, items});
-    localStorage.setItem('neva_orders', JSON.stringify(localOrders));
-    orders.unshift({...saved, items});
-
-    cart=[]; activePromo=null;
-    saveCart(); updateCartUI();
-    closeCheckout();
-    document.getElementById('cart-drawer').classList.remove('open');
-    showToast('Заказ оформлен ✓');
-    updateOrdersBadge();
-  } catch(e){
-    console.error(e);
-    showToast('Ошибка отправки — повторите попытку');
-  }
-  btn.disabled=false; btn.textContent='Подтвердить заказ →';
+  const name = document.getElementById('co-name') ? document.getElementById('co-name').value.trim() : '';
+  const contact = document.getElementById('co-contact') ? document.getElementById('co-contact').value.trim() : '';
+  const city = document.getElementById('co-city') ? document.getElementById('co-city').value.trim() : '';
+  const address = document.getElementById('co-address') ? document.getElementById('co-address').value.trim() : '';
+  const zip = document.getElementById('co-zip') ? document.getElementById('co-zip').value.trim() : '';
+  const comment = document.getElementById('co-comment') ? document.getElementById('co-comment').value.trim() : '';
+  
+  handleTechWorkCheckout(name, contact, city, address, zip, comment);
 }
 
 // ═══════════════════════════════════════════
@@ -3124,36 +3104,23 @@ async function openOrdersPanel(){
   const localOrders = JSON.parse(localStorage.getItem('neva_orders')||'[]');
   const list=document.getElementById('orders-list-client');
   document.getElementById('orders-panel').classList.add('open');
-  list.innerHTML='<div class="op-empty" style="opacity:.4">Загрузка...</div>';
 
   if(!localOrders.length){ list.innerHTML='<div class="op-empty">Заказов пока нет</div>'; return; }
 
-  let liveStatuses = {};
-  try {
-    const ids = localOrders.map(o=>o.id).filter(Boolean).join(',');
-    if(ids) {
-      const fresh = await sbGet('orders', `id=in.(${ids})&select=id,status`) || [];
-      if(Array.isArray(fresh)) fresh.forEach(o=>{ liveStatuses[o.id]=o.status; });
-    }
-  } catch(e){ }
-
   list.innerHTML='';
   localOrders.forEach(o=>{
-    const status = liveStatuses[o.id] || o.status;
-    o.status = status;
+    const status = o.status || 'pending';
     const items=Array.isArray(o.items)?o.items:(typeof o.items==='string'?JSON.parse(o.items):[]);
     const itemsStr=items.map(i=>`${i.name} × ${i.qty}`).join(', ');
     const el=document.createElement('div'); el.className='op-order';
     el.innerHTML=`
-      <div class="op-order-id">${o.id} · ${new Date(o.created_at||Date.now()).toLocaleString('ru-RU')}</div>
+      <div class="op-order-id">${o.id||'#'} · ${new Date(o.created_at||Date.now()).toLocaleString('ru-RU')}</div>
       <div class="op-order-items">${itemsStr}</div>
-      ${o.address?`<div class="op-order-items" style="opacity:.4">${o.delivery} · ${o.address}</div>`:''}
-      ${o.promo_code?`<div class="op-order-items" style="color:#1a9e3f">Промокод: ${o.promo_code} (−${(o.discount||0).toLocaleString('ru-RU')} ₽)</div>`:''}
+      ${o.address?`<div class="op-order-items" style="opacity:.4">${o.delivery||''} · ${o.address}</div>`:''}
       <div class="op-order-total">${(o.total||0).toLocaleString('ru-RU')} ₽</div>
       <span class="op-status ${status}">${STATUS_LABELS[status]||status}</span>`;
     list.appendChild(el);
   });
-  localStorage.setItem('neva_orders', JSON.stringify(localOrders));
 }
 function closeOrdersPanel(){ document.getElementById('orders-panel').classList.remove('open'); }
 document.getElementById('orders-panel').onclick=e=>{ if(e.target===document.getElementById('orders-panel')) closeOrdersPanel(); };
@@ -3254,6 +3221,7 @@ function updateTechWorkUI() {
 // ═══════════════════════════════════════════
 function openAdmin(){
   document.getElementById('admin-modal').classList.add('open');
+  loadGitHubSettingsUI();
   renderAdminProducts(); renderAdminSections(); renderAdminOrders(); renderAdminPromos();
   updateOrdersBadge();
   const bgUrl=getSetting('header_bg');
@@ -3305,17 +3273,11 @@ function renderAdminProducts(){
 
 async function deleteProduct(id){
   if(!confirm('Удалить этот товар?')) return;
-  try{
-    await sbDelete('products', `id=eq.${id}`);
-    products = products.filter(p => p.id !== id);
-    saveToCache('products', products);
-    renderSite();
-    renderAdminProducts();
-    showToast('Товар удалён');
-  } catch(e){
-    console.error(e);
-    showToast('Ошибка удаления: ' + e.message);
-  }
+  products = products.filter(p => p.id !== id);
+  saveToCache('products', products);
+  renderSite();
+  renderAdminProducts();
+  await syncProductsToGitHub();
 }
 
 function populateSectionSel(selId){
@@ -3453,6 +3415,7 @@ async function saveProduct() {
   const sizes = (pfSizes && typeof pfSizes === 'object') ? {...pfSizes} : {};
 
   const data = {
+    id: id || ('p_' + Date.now()),
     name,
     price,
     cat,
@@ -3464,30 +3427,20 @@ async function saveProduct() {
     sizes
   };
 
-  try {
-    if (id) {
-      const res = await sbUpdate('products', `id=eq.${id}`, data);
-      const updated = Array.isArray(res) ? res[0] : res;
-      const idx = products.findIndex(x => x.id === id);
-      if (idx >= 0) products[idx] = { ...products[idx], ...(updated || data) };
-    } else {
-      const res = await sbInsert('products', data);
-      const created = Array.isArray(res) ? res[0] : res;
-      if (created) {
-        products.push(created);
-      } else {
-        products.push({ id: 'p_' + Date.now(), ...data });
-      }
-    }
-    saveToCache('products', products);
-    renderSite();
-    renderAdminProducts();
-    cancelProductForm();
-    showToast('Товар сохранён ✓');
-  } catch (e) {
-    console.error('Save product error:', e);
-    alert('ОШИБКА СОХРАНЕНИЯ В БАЗУ SUPABASE:\n' + (e.message || JSON.stringify(e)));
+  if (id) {
+    const idx = products.findIndex(x => x.id === id);
+    if (idx >= 0) products[idx] = data;
+  } else {
+    products.push(data);
   }
+
+  saveToCache('products', products);
+  renderSite();
+  renderAdminProducts();
+  cancelProductForm();
+
+  // Отправка в GitHub репозиторий
+  await syncProductsToGitHub();
 }
 
 // ── SECTIONS ──
@@ -3501,30 +3454,23 @@ function renderAdminSections(){
   });
   list.onclick=e=>{ const b=e.target.closest('[data-del]'); if(b) deleteSection(b.dataset.del); };
 }
-async function addSection(){
+function addSection(){
   const name=document.getElementById('sec-name').value.trim(); if(!name) return;
-  const data={name, sort_order:parseInt(document.getElementById('sec-order').value)||0, img_url:document.getElementById('sec-img-data').value||null};
-  try{
-    const res = await sbInsert('sections', data);
-    const created = Array.isArray(res) ? res[0] : res;
-    sections.push(created || data);
-    saveToCache('sections', sections);
-    renderSite(); renderAdminSections(); populateSectionSel('');
-    document.getElementById('sec-name').value=''; document.getElementById('sec-order').value='';
-    document.getElementById('sec-img-data').value=''; document.getElementById('sec-img-prev').style.display='none';
-    showToast('Раздел добавлен');
-  } catch(e){ showToast('Ошибка: '+e.message); }
+  const data={id:'sec_'+Date.now(), name, sort_order:parseInt(document.getElementById('sec-order').value)||0, img_url:document.getElementById('sec-img-data').value||null};
+  sections.push(data);
+  saveToCache('sections', sections);
+  renderSite(); renderAdminSections(); populateSectionSel('');
+  document.getElementById('sec-name').value=''; document.getElementById('sec-order').value='';
+  document.getElementById('sec-img-data').value=''; document.getElementById('sec-img-prev').style.display='none';
+  showToast('Раздел добавлен');
 }
-async function deleteSection(id){
+function deleteSection(id){
   if(!confirm('Удалить раздел?')) return;
-  try{
-    await sbDelete('sections',`id=eq.${id}`);
-    sections=sections.filter(s=>s.id!==id);
-    products.forEach(p=>{ if(p.section_id===id) p.section_id=null; });
-    saveToCache('sections', sections);
-    renderSite(); renderAdminSections();
-    showToast('Раздел удалён');
-  } catch(e){ showToast('Ошибка: '+e.message); }
+  sections=sections.filter(s=>s.id!==id);
+  products.forEach(p=>{ if(p.section_id===id) p.section_id=null; });
+  saveToCache('sections', sections);
+  renderSite(); renderAdminSections();
+  showToast('Раздел удалён');
 }
 
 // ── ORDERS ──
@@ -3536,42 +3482,12 @@ function renderAdminOrders(){
     const itemsStr=items.map(i=>`${i.name} × ${i.qty}`).join(', ');
     const el=document.createElement('div'); el.className='admin-order-row';
     el.innerHTML=`
-      <div class="admin-order-id">${o.id} · ${new Date(o.created_at).toLocaleString('ru-RU')}</div>
-      <div class="admin-order-info">${o.customer_name} · ${o.contact}${o.address?' · '+o.address:''}</div>
-      ${o.delivery?`<div class="admin-order-info" style="opacity:.4">${o.delivery}</div>`:''}
+      <div class="admin-order-id">${o.id} · ${new Date(o.created_at||Date.now()).toLocaleString('ru-RU')}</div>
+      <div class="admin-order-info">${o.customer_name||'Покупатель'} · ${o.contact||''}${o.address?' · '+o.address:''}</div>
       <div class="admin-order-info">${itemsStr}</div>
-      ${o.promo_code?`<div class="admin-order-info" style="color:#000000; font-weight:bold;">Промокод: ${o.promo_code} (−${(o.discount||0).toLocaleString('ru-RU')} ₽)</div>`:''}
-      ${o.comment?`<div class="admin-order-info" style="opacity:.4">Комментарий: ${o.comment}</div>`:''}
-      <div class="admin-order-total">${(o.total||0).toLocaleString('ru-RU')} ₽</div>
-      <div class="admin-order-bottom">
-        <select class="status-select" data-oid="${o.id}">
-          <option value="pending"${o.status==='pending'?' selected':''}>Принят</option>
-          <option value="confirmed"${o.status==='confirmed'?' selected':''}>Подтверждён</option>
-          <option value="shipped"${o.status==='shipped'?' selected':''}>Отправлен</option>
-          <option value="done"${o.status==='done'?' selected':''}>Доставлен</option>
-          <option value="cancelled"${o.status==='cancelled'?' selected':''}>Отменён</option>
-        </select>
-        <button class="admin-btn danger sm" data-delorder="${o.id}">Удалить</button>
-      </div>`;
+      <div class="admin-order-total">${(o.total||0).toLocaleString('ru-RU')} ₽</div>`;
     list.appendChild(el);
   });
-  list.onchange=e=>{ const sel=e.target.closest('[data-oid]'); if(sel) setOrderStatus(sel.dataset.oid, sel.value); };
-  list.onclick=e=>{ const b=e.target.closest('[data-delorder]'); if(b) deleteOrder(b.dataset.delorder); };
-}
-async function setOrderStatus(id, status){
-  try{
-    await sbUpdate('orders',`id=eq.${id}`,{status});
-    const o=orders.find(x=>x.id===id); if(o) o.status=status;
-    renderAdminOrders(); updateOrdersBadge();
-  } catch(e){ showToast('Ошибка: '+e.message); }
-}
-async function deleteOrder(id){
-  if(!confirm('Удалить заказ?')) return;
-  try{
-    await sbDelete('orders',`id=eq.${id}`);
-    orders=orders.filter(o=>o.id!==id);
-    renderAdminOrders(); updateOrdersBadge();
-  } catch(e){ showToast('Ошибка: '+e.message); }
 }
 
 // ── PROMOS ──
@@ -3581,38 +3497,25 @@ function renderAdminPromos(){
   promos.forEach(p=>{
     const row=document.createElement('div'); row.className='admin-order-row';
     row.style.display='flex'; row.style.alignItems='center'; row.style.gap='12px';
-    row.innerHTML=`<div style="flex:1"><div class="admin-product-name" style="color:#000000">${p.code}</div><div class="admin-product-meta">Скидка: ${p.discount}% · ${p.active?'<span style="color:#1a9e3f">Активен</span>':'<span style="color:#ff0000">Отключён</span>'}</div></div><div style="display:flex;gap:6px"><button class="admin-btn secondary sm" data-toggle="${p.id}">${p.active?'Откл.':'Вкл.'}</button><button class="admin-btn danger sm" data-delpromo="${p.id}">Удалить</button></div>`;
+    row.innerHTML=`<div style="flex:1"><div class="admin-product-name" style="color:#000000">${p.code}</div><div class="admin-product-meta">Скидка: ${p.discount}%</div></div><button class="admin-btn danger sm" data-delpromo="${p.id}">Удалить</button>`;
     list.appendChild(row);
   });
   list.onclick=e=>{
-    const t=e.target.closest('[data-toggle]'); if(t){ togglePromo(t.dataset.toggle); return; }
     const d=e.target.closest('[data-delpromo]'); if(d) deletePromo(d.dataset.delpromo);
   };
 }
-async function addPromo(){
+function addPromo(){
   const code=document.getElementById('promo-code').value.trim().toUpperCase();
   const discount=parseInt(document.getElementById('promo-discount').value)||0;
   if(!code){ showToast('Введите код'); return; }
   if(discount<1||discount>100){ showToast('Скидка 1–100%'); return; }
-  if(promos.find(p=>p.code.toUpperCase()===code)){ showToast('Такой код уже есть'); return; }
-  try{
-    const res = await sbInsert('promos',{code,discount,active:true});
-    const created = Array.isArray(res) ? res[0] : res;
-    promos.push(created || {code,discount,active:true});
-    renderAdminPromos();
-    document.getElementById('promo-code').value=''; document.getElementById('promo-discount').value='';
-    showToast('Промокод добавлен');
-  } catch(e){ showToast('Ошибка: '+e.message); }
+  promos.push({id:'pr_'+Date.now(), code, discount, active:true});
+  renderAdminPromos();
+  document.getElementById('promo-code').value=''; document.getElementById('promo-discount').value='';
+  showToast('Промокод добавлен');
 }
-async function togglePromo(id){
-  const p=promos.find(x=>x.id===id); if(!p) return;
-  try{ await sbUpdate('promos',`id=eq.${id}`,{active:!p.active}); p.active=!p.active; renderAdminPromos(); }
-  catch(e){ showToast('Ошибка: '+e.message); }
-}
-async function deletePromo(id){
-  if(!confirm('Удалить промокод?')) return;
-  try{ await sbDelete('promos',`id=eq.${id}`); promos=promos.filter(p=>p.id!==id); renderAdminPromos(); showToast('Удален'); }
-  catch(e){ showToast('Ошибка: '+e.message); }
+function deletePromo(id){
+  promos=promos.filter(p=>p.id!==id); renderAdminPromos(); showToast('Удален');
 }
 
 // ── DESIGN & SETTINGS ──
@@ -3664,25 +3567,14 @@ async function saveDesignSettings() {
   const textCh = document.getElementById('design-text-checkout').checked ? 'true' : 'false';
   await setSetting('text_checkout_enabled', textCh);
   await setSetting('ticket_bgs', JSON.stringify(adminTicketBgs));
-  
   showToast('Настройки сохранены');
   renderSite();
 }
 
-async function resetAll(){
-  if(!confirm('Сбросить ВСЕ данные в базе?')) return;
-  try{
-    if(products.length) await sbDelete('products','id=neq.00000000-0000-0000-0000-000000000000');
-    if(sections.length) await sbDelete('sections','id=neq.00000000-0000-0000-0000-000000000000');
-    if(orders.length) await sbDelete('orders','id=neq.00000000-0000-0000-0000-000000000000');
-    if(promos.length) await sbDelete('promos','id=neq.00000000-0000-0000-0000-000000000000');
-  } catch(e){ console.warn('reset:', e); }
-  products=[]; sections=[]; orders=[]; promos=[]; settings={};
-  cart=[]; saveCart();
-  localStorage.removeItem('neva_orders');
-  localStorage.removeItem('neva_products');
-  localStorage.removeItem('neva_sections');
-  localStorage.removeItem('neva_settings');
+function resetAll(){
+  if(!confirm('Сбросить данные?')) return;
+  products=[]; sections=[]; orders=[]; promos=[]; settings={}; cart=[]; saveCart();
+  localStorage.clear();
   renderSite(); renderAdminProducts(); renderAdminSections(); renderAdminOrders(); renderAdminPromos();
   updateCartUI(); updateOrdersBadge(); applySettings();
   showToast('Данные сброшены');
