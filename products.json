@@ -1,22 +1,5 @@
 [
   {
-    "id": "p1",
-    "name": "NEVASTICK TEE BLACK",
-    "price": 2500,
-    "cat": "Футболки",
-    "desc": "Прямая шелкография, 100% плотный хлопок 220г/м². Оверсайз крой.",
-    "badge": "HIT",
-    "imgs": [
-      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&auto=format&fit=crop&q=60"
-    ],
-    "sizes": {
-      "S": 5,
-      "M": 12,
-      "L": 8,
-      "XL": 3
-    }
-  },
-  {
     "id": "p_1786357555668",
     "name": "1",
     "price": 1,
