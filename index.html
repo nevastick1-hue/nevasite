@@ -2451,18 +2451,23 @@ function saveLikes(){ localStorage.setItem('neva_likes', JSON.stringify(likes));
 async function ensureTables(){
   loadFromCache();
 
-  // 1. Приоритетная загрузка из файла products.json
-  try {
-    const pJsonRes = await fetch('products.json?v=' + Date.now());
-    if (pJsonRes.ok) {
-      const pJsonData = await pJsonRes.json();
-      if (Array.isArray(pJsonData) && pJsonData.length > 0) {
-        products = pJsonData.map(p => ({...p, desc: p.desc || p.description || ''}));
-        saveToCache('products', products);
+  // Загружаем из products.json только если локально не было недавних сохранений (за последние 5 мин)
+  const lastEdit = parseInt(localStorage.getItem('neva_last_local_edit') || '0');
+  const isRecentlyEditedLocally = (Date.now() - lastEdit) < 300000;
+
+  if (!isRecentlyEditedLocally || !products || products.length === 0) {
+    try {
+      const pJsonRes = await fetch('products.json?v=' + Date.now());
+      if (pJsonRes.ok) {
+        const pJsonData = await pJsonRes.json();
+        if (Array.isArray(pJsonData) && pJsonData.length > 0) {
+          products = pJsonData.map(p => ({...p, desc: p.desc || p.description || ''}));
+          saveToCache('products', products);
+        }
       }
+    } catch (errJson) {
+      console.warn("products.json load fail, using cache:", errJson);
     }
-  } catch (errJson) {
-    console.warn("products.json load fail, using cache:", errJson);
   }
 }
 
@@ -3266,17 +3271,29 @@ function renderAdminProducts(){
     list.appendChild(row);
   });
   list.onclick=e=>{
-    const e2=e.target.dataset.edit; if(e2){ openProductForm(e2); return; }
-    const d=e.target.dataset.del; if(d) deleteProduct(d);
+    const editBtn = e.target.closest('[data-edit]');
+    if(editBtn){ openProductForm(editBtn.dataset.edit); return; }
+    const delBtn = e.target.closest('[data-del]');
+    if(delBtn){ deleteProduct(delBtn.dataset.del); return; }
   };
 }
 
 async function deleteProduct(id){
-  if(!confirm('Удалить этот товар?')) return;
-  products = products.filter(p => p.id !== id);
+  if(!confirm('Вы уверены, что хотите удалить этот товар?')) return;
+  
+  // Удаляем товар из локального массива
+  products = products.filter(p => String(p.id) !== String(id));
+  
+  // Фиксируем время недавней локальной правки
+  localStorage.setItem('neva_last_local_edit', Date.now());
   saveToCache('products', products);
+  
+  // Перерисовываем интерфейс
   renderSite();
   renderAdminProducts();
+  showToast('Товар удалён из списка');
+
+  // Отправляем изменения в репозиторий GitHub
   await syncProductsToGitHub();
 }
 
@@ -3287,7 +3304,7 @@ function populateSectionSel(selId){
 }
 
 function openProductForm(id) {
-  const p = id ? products.find(x => x.id === id) : null;
+  const p = id ? products.find(x => String(x.id) === String(id)) : null;
   pfPhotos = p && p.imgs ? Array.from(p.imgs) : [];
   pfSizes = p && p.sizes ? { ...p.sizes } : {};
 
@@ -3428,12 +3445,13 @@ async function saveProduct() {
   };
 
   if (id) {
-    const idx = products.findIndex(x => x.id === id);
+    const idx = products.findIndex(x => String(x.id) === String(id));
     if (idx >= 0) products[idx] = data;
   } else {
     products.push(data);
   }
 
+  localStorage.setItem('neva_last_local_edit', Date.now());
   saveToCache('products', products);
   renderSite();
   renderAdminProducts();
@@ -3466,8 +3484,8 @@ function addSection(){
 }
 function deleteSection(id){
   if(!confirm('Удалить раздел?')) return;
-  sections=sections.filter(s=>s.id!==id);
-  products.forEach(p=>{ if(p.section_id===id) p.section_id=null; });
+  sections=sections.filter(s=>String(s.id)!==String(id));
+  products.forEach(p=>{ if(String(p.section_id)===String(id)) p.section_id=null; });
   saveToCache('sections', sections);
   renderSite(); renderAdminSections();
   showToast('Раздел удалён');
@@ -3515,7 +3533,7 @@ function addPromo(){
   showToast('Промокод добавлен');
 }
 function deletePromo(id){
-  promos=promos.filter(p=>p.id!==id); renderAdminPromos(); showToast('Удален');
+  promos=promos.filter(p=>String(p.id)!==String(id)); renderAdminPromos(); showToast('Удален');
 }
 
 // ── DESIGN & SETTINGS ──
