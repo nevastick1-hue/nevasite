@@ -1,17 +1,5 @@
 [
   {
-    "id": "p3",
-    "name": "STICKER PACK VOL. 4",
-    "price": 600,
-    "cat": "Стикеры",
-    "desc": "Набор из 15 виниловых стикеров от участников фестиваля NEVASTICK. Устойчивы к воде и УФ.",
-    "badge": "BEST",
-    "imgs": [
-      "https://images.unsplash.com/photo-1572375992501-4b0892d50c69?w=800&auto=format&fit=crop&q=60"
-    ],
-    "sizes": {}
-  },
-  {
     "id": "p4",
     "name": "NEVASTICK CAP SPRAY",
     "price": 1800,
