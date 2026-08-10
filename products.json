@@ -1,19 +1,5 @@
 [
   {
-    "id": "p4",
-    "name": "NEVASTICK CAP SPRAY",
-    "price": 1800,
-    "cat": "Аксессуары",
-    "desc": "Пятипанельная кепка с металлическим фиксатором и рефлективным логотипом.",
-    "badge": "LIMITED",
-    "imgs": [
-      "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=800&auto=format&fit=crop&q=60"
-    ],
-    "sizes": {
-      "ONE SIZE": 15
-    }
-  },
-  {
     "id": "p5",
     "name": "TOTE BAG URBAN STREET",
     "price": 1200,
