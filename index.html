@@ -1939,6 +1939,111 @@ footer {
   justify-content: center;
 }
 
+/* MAGAZINE CONTEST */
+.magazine-section {
+  position: relative;
+  z-index: 1;
+  max-width: 1400px;
+  margin: 0 auto 80px;
+  padding: 90px 24px;
+}
+.magazine-box {
+  position: relative;
+  overflow: hidden;
+  border: 3px solid var(--border);
+  background: #ffffff;
+  box-shadow: 10px 10px 0 #000;
+  min-height: 560px;
+}
+.magazine-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(1) contrast(1.1);
+  opacity: .18;
+}
+.magazine-content {
+  position: relative;
+  z-index: 2;
+  padding: clamp(24px, 5vw, 60px);
+}
+.magazine-kicker, .magazine-timer-label {
+  font-size: .7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .18em;
+}
+.magazine-title {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: clamp(2.2rem, 8vw, 6rem);
+  line-height: .9;
+  letter-spacing: -.06em;
+  text-transform: uppercase;
+  margin: 14px 0 20px;
+}
+.magazine-desc {
+  max-width: 760px;
+  font-size: .9rem;
+  line-height: 1.7;
+  font-weight: 700;
+  margin-bottom: 28px;
+}
+.magazine-topline {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.magazine-timer {
+  background: #000;
+  color: #fff;
+  border: 3px solid #000;
+  padding: 16px 20px;
+  min-width: 210px;
+  box-shadow: 5px 5px 0 var(--brand-pink);
+}
+.magazine-timer-value {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 2.2rem;
+  line-height: 1;
+  margin-top: 6px;
+}
+.magazine-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  max-width: 900px;
+}
+.magazine-field { display:flex; flex-direction:column; gap:8px; }
+.magazine-field.full { grid-column: 1 / -1; }
+.magazine-field label { font-size:.65rem; font-weight:900; text-transform:uppercase; letter-spacing:.08em; }
+.magazine-input, .magazine-textarea {
+  width: 100%;
+  border: 2px solid #000;
+  background: #fff;
+  padding: 14px 16px;
+  font-family: 'Space Mono', monospace;
+  font-size: .8rem;
+  outline: none;
+}
+.magazine-textarea { min-height: 80px; resize: vertical; }
+.magazine-upload { border: 3px dashed #000; background:#fff; padding: 28px; text-align:center; cursor:pointer; }
+.magazine-submit, .magazine-like-btn {
+  background:#000; color:#fff; border:2px solid #000; padding:14px 24px;
+  font-family:'Archivo Black', sans-serif; font-size:.75rem; text-transform:uppercase; cursor:pointer; box-shadow:4px 4px 0 var(--brand-pink);
+}
+.magazine-gallery { display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:24px; margin-top:30px; }
+.magazine-work { border:3px solid #000; background:#fff; box-shadow:6px 6px 0 #000; overflow:hidden; }
+.magazine-work-img { aspect-ratio: 1 / 1; background: var(--muted); border-bottom:3px solid #000; }
+.magazine-work-img img { width:100%; height:100%; object-fit:cover; display:block; }
+.magazine-work-body { padding:16px; }
+.magazine-work-title { font-family:'Archivo Black', sans-serif; font-size:.9rem; text-transform:uppercase; margin-bottom:8px; }
+.magazine-work-meta { font-size:.65rem; font-weight:700; opacity:.7; line-height:1.5; margin-bottom:14px; }
+.magazine-empty { border:3px solid #000; background:#fff; padding:32px; font-family:'Archivo Black', sans-serif; text-transform:uppercase; text-align:center; }
+@media(max-width: 680px){ .magazine-form{grid-template-columns:1fr;} }
+
 @media(max-width: 600px){
   .admin-form-row { grid-template-columns: 1fr; }
   .admin-inner { padding: 30px 16px; }
@@ -1981,7 +2086,7 @@ footer {
       <div class="header-logo-text">NEVASTICK</div>
     </div>
     <p class="header-sub" id="header-sub-text">FESTIVAL STREET-ART & URBAN CULTURE</p>
-    
+
     <!-- Marquee -->
     <div class="marquee-container">
       <div class="marquee-inner">
@@ -2130,7 +2235,7 @@ footer {
     <button class="admin-close-btn" onclick="closeAdmin()">✕ Закрыть</button>
     <div class="admin-title">Admin Panel</div>
     <p class="admin-sub">Nevastick Merch Store</p>
-    
+
     <div style="padding:16px; background:#fffbe6; border:2px solid #000; margin-bottom:28px;">
       <strong style="font-size:0.8rem; text-transform:uppercase;">⚙️ Настройки GitHub API (Для автосохранения на GitHub):</strong>
       <p style="font-size:0.65rem; opacity:0.7; margin:4px 0 12px;">Укажите ваш логин, репозиторий и токен, чтобы админка сохраняла товары прямо на GitHub.</p>
@@ -2158,6 +2263,7 @@ footer {
       <button class="admin-tab" data-tab="orders" onclick="switchTab('orders')">Заказы <span id="admin-orders-badge" style="display:none;background:#000;color:#fff;border:1px solid #fff;font-size:.55rem;padding:1px 6px;margin-left:4px"></span></button>
       <button class="admin-tab" data-tab="promos" onclick="switchTab('promos')">Промокоды</button>
       <button class="admin-tab" data-tab="design" onclick="switchTab('design')">Дизайн</button>
+      <button class="admin-tab" data-tab="magazine" onclick="switchTab('magazine')">Журнал</button>
     </div>
 
     <!-- PRODUCTS TAB -->
@@ -2301,6 +2407,31 @@ footer {
       <p class="admin-section-title" style="margin-top:40px">Опасная зона</p>
       <button class="admin-btn danger" onclick="resetAll()">Сбросить все данные</button>
     </div>
+
+    <!-- MAGAZINE TAB -->
+    <div class="admin-panel" id="tab-magazine">
+      <p class="admin-section-title">Журнал: конкурс работ</p>
+      <div class="admin-form-row">
+        <div class="admin-field"><label>Название в превью формы</label><input class="admin-input" id="mag-title" placeholder="Попади в новый выпуск журнала"></div>
+        <div class="admin-field"><label>Режим конкурса</label><select class="admin-select" id="mag-mode"><option value="upload">Загрузка работ</option><option value="vote">Голосование</option></select></div>
+      </div>
+      <div class="admin-form-row full"><div class="admin-field"><label>Описание</label><textarea class="admin-textarea" id="mag-desc" placeholder="Загружай работы или голосуй за лучших"></textarea></div></div>
+      <div class="admin-form-row">
+        <div class="admin-field"><label>Дней до окончания загрузки</label><input class="admin-input" id="mag-upload-days" type="number" min="0" placeholder="14"></div>
+        <div class="admin-field"><label>Дней до окончания голосования</label><input class="admin-input" id="mag-vote-days" type="number" min="0" placeholder="7"></div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px">
+        <button class="admin-btn secondary" onclick="setMagazineMode('upload')">Включить загрузку работ</button>
+        <button class="admin-btn secondary" onclick="setMagazineMode('vote')">Включить голосование</button>
+      </div>
+      <div class="admin-form-row full"><div class="admin-field"><label>Фон формы / голосования</label><div class="upload-area" onclick="document.getElementById('mag-bg-input').click()"><input type="file" id="mag-bg-input" accept="image/*" onchange="previewImg(this,'mag-bg-prev','mag-bg-data')"><p>Загрузить фон раздела журнала</p><img id="mag-bg-prev" style="max-width:200px;max-height:120px;margin:10px auto 0;display:none;object-fit:cover;border:1px solid #000"></div></div></div>
+      <input type="hidden" id="mag-bg-data">
+      <div class="admin-form-row">
+        <div class="admin-field" style="flex-direction:row;align-items:center"><input type="checkbox" id="mag-hide-tickets" style="width:20px;height:20px"><label for="mag-hide-tickets">Отключить блок покупки билетов</label></div>
+        <div class="admin-field" style="flex-direction:row;align-items:center"><input type="checkbox" id="mag-hide-merch" style="width:20px;height:20px"><label for="mag-hide-merch">Отключить блок мерча</label></div>
+      </div>
+      <button class="admin-btn primary" onclick="saveMagazineSettings()">Сохранить раздел журнала</button>
+    </div>
   </div>
 </div>
 
@@ -2422,12 +2553,15 @@ let activeFilter = null;
 let pmId = null, pmPhotos = [], pmPhotoIdx = 0;
 let cart = [];
 let activePromo = null;
+let magazineWorks = [];
+let magazineWorkPhotos = [];
 
 function loadFromCache() {
   try {
     const p = localStorage.getItem('neva_products'); if(p) { const parsed = JSON.parse(p); if(Array.isArray(parsed)) products = parsed; }
     const s = localStorage.getItem('neva_sections'); if(s) { const parsed = JSON.parse(s); if(Array.isArray(parsed)) sections = parsed; }
     const st = localStorage.getItem('neva_settings'); if(st) settings = JSON.parse(st);
+    const mw = localStorage.getItem('neva_magazine_works'); if(mw) { const parsed = JSON.parse(mw); if(Array.isArray(parsed)) magazineWorks = parsed; }
   } catch(e) { console.warn('Cache load:', e); }
 }
 
@@ -2485,7 +2619,7 @@ setTimeout(hideLoader, 3000);
 
 async function init(){
   try {
-    loadCart(); 
+    loadCart();
     loadLikes();
     await ensureTables();
     applySettings();
@@ -2510,7 +2644,7 @@ async function setSetting(key, value){
 function applySettings(){
   const hdrBg = document.getElementById('header-bg');
   const bgUrl = getSetting('header_bg') || '';
-  
+
   if(bgUrl){ hdrBg.style.backgroundImage=`url(${bgUrl})`; }
   else { hdrBg.style.backgroundImage='none'; }
 
@@ -2519,8 +2653,10 @@ function applySettings(){
 
   const sub = getSetting('header_sub','FESTIVAL STREET-ART & URBAN CULTURE');
   document.getElementById('header-sub-text').textContent = sub;
-  
+
   updateTechWorkUI();
+  const ticketsBox = document.getElementById('tickets-box');
+  if(ticketsBox) ticketsBox.style.display = getSetting('mag_hide_tickets') === 'true' ? 'none' : 'flex';
 }
 
 // ═══════════════════════════════════════════
@@ -2533,13 +2669,13 @@ function startTicketSlideshow() {
   const container = document.getElementById('tickets-slides');
   if(!container) return;
   container.innerHTML = '';
-  
+
   let bgs = [];
   try {
     const stored = getSetting('ticket_bgs');
     if(stored) bgs = JSON.parse(stored);
   } catch(e) { console.warn(e); }
-  
+
   if(!bgs || !bgs.length) {
     bgs = [
       'input_file_0.jpeg',
@@ -2547,14 +2683,14 @@ function startTicketSlideshow() {
       'input_file_2.jpeg'
     ];
   }
-  
+
   bgs.forEach((img, idx) => {
     const div = document.createElement('div');
     div.className = 'tickets-slide' + (idx === 0 ? ' active' : '');
     div.style.backgroundImage = `url(${img})`;
     container.appendChild(div);
   });
-  
+
   clearInterval(slideTimer);
   if(bgs.length > 1) {
     activeSlideIdx = 0;
@@ -2574,7 +2710,7 @@ function startTicketSlideshow() {
 function renderSite(){
   applySettings();
   startTicketSlideshow();
-  
+
   if (!Array.isArray(products)) products = [];
   if (!Array.isArray(sections)) sections = [];
 
@@ -2591,14 +2727,17 @@ function renderSite(){
 
   const main = document.getElementById('main-content');
   main.innerHTML = '';
+  main.appendChild(buildMagazineSection());
+  const hideMerch = getSetting('mag_hide_merch') === 'true';
+
+  if (hideMerch) return;
 
   if (products.length === 0) {
-    main.innerHTML = `
-      <div class="products-section" style="text-align:center; padding:60px 20px;">
-        <p style="font-family:'Archivo Black', sans-serif; font-size:1.1rem; opacity:0.5; text-transform:uppercase;">
-          Товары загружаются или отсутствуют
-        </p>
-      </div>`;
+    const empty = document.createElement('div');
+    empty.className = 'products-section';
+    empty.style.cssText = 'text-align:center; padding:60px 20px;';
+    empty.innerHTML = `<p style="font-family:'Archivo Black', sans-serif; font-size:1.1rem; opacity:0.5; text-transform:uppercase;">Товары загружаются или отсутствуют</p>`;
+    main.appendChild(empty);
     return;
   }
 
@@ -2623,6 +2762,47 @@ function renderSite(){
     if(prods.length) main.appendChild(buildSection(s.name, prods));
   });
 }
+
+
+function getMagazineDeadline(mode){
+  const key = mode === 'vote' ? 'mag_vote_deadline' : 'mag_upload_deadline';
+  let ts = parseInt(getSetting(key, '0')) || 0;
+  if(!ts) {
+    const days = parseInt(getSetting(mode === 'vote' ? 'mag_vote_days' : 'mag_upload_days', mode === 'vote' ? '7' : '14')) || 0;
+    ts = Date.now() + days * 86400000;
+  }
+  return ts;
+}
+function getDaysLeft(ts){
+  if(!ts) return 0;
+  return Math.max(0, Math.ceil((ts - Date.now()) / 86400000));
+}
+function buildMagazineSection(){
+  const mode = getSetting('mag_mode','upload');
+  const title = getSetting('mag_title','Конкурс работ в новый выпуск журнала');
+  const desc = getSetting('mag_desc','Загружай свои работы для отбора в новый выпуск NEVASTICK Magazine или голосуй за авторов, которых хочешь увидеть на страницах.');
+  const bg = getSetting('mag_bg','');
+  const deadline = getMagazineDeadline(mode);
+  const days = getDaysLeft(deadline);
+  const closed = deadline && Date.now() > deadline;
+  const section = document.createElement('section');
+  section.className = 'magazine-section';
+  section.innerHTML = `<div class="magazine-box"><div class="magazine-bg" style="${bg?`background-image:url(${bg})`:''}"></div><div class="magazine-content"><div class="magazine-topline"><div><div class="magazine-kicker">NEVASTICK MAGAZINE / ${mode==='vote'?'Голосование':'Open call'}</div><h2 class="magazine-title">${title}</h2><p class="magazine-desc">${desc}</p></div><div class="magazine-timer"><div class="magazine-timer-label">${mode==='vote'?'До конца голосования':'До конца загрузки'}</div><div class="magazine-timer-value">${closed?'0':days} дн.</div></div></div><div id="magazine-body"></div></div></div>`;
+  const body = section.querySelector('#magazine-body');
+  if(mode === 'vote') body.appendChild(buildMagazineGallery(closed));
+  else body.innerHTML = closed ? '<div class="magazine-empty">Загрузка работ закрыта</div>' : `<form class="magazine-form" onsubmit="submitMagazineWork(event)"><div class="magazine-field"><label>Ник / имя</label><input class="magazine-input" id="mag-name" required></div><div class="magazine-field"><label>Соц. сети</label><input class="magazine-input" id="mag-socials"></div><div class="magazine-field"><label>ТГ для связи</label><input class="magazine-input" id="mag-tg" required placeholder="@username"></div><div class="magazine-field"><label>Название работы или серии</label><input class="magazine-input" id="mag-work-title" required></div><div class="magazine-field full"><label>Фотографии с устройства</label><div class="magazine-upload" onclick="document.getElementById('mag-work-files').click()"><input type="file" id="mag-work-files" accept="image/*" multiple style="display:none" onchange="addMagazineWorkPhotos(this)"><strong>Нажмите, чтобы выбрать фото</strong><p id="mag-work-files-note" style="font-size:.65rem;margin-top:8px;opacity:.65">Фото пока не выбраны</p></div></div><div class="magazine-field full"><button class="magazine-submit" type="submit">Отправить работу</button></div></form>`;
+  return section;
+}
+function buildMagazineGallery(closed){
+  const wrap = document.createElement('div');
+  if(!magazineWorks.length){ wrap.innerHTML = '<div class="magazine-empty">Работы появятся здесь после загрузки</div>'; return wrap; }
+  wrap.className = 'magazine-gallery';
+  magazineWorks.forEach(w=>{ const liked = localStorage.getItem('neva_mag_like_'+w.id)==='true'; const card=document.createElement('div'); card.className='magazine-work'; card.innerHTML=`<div class="magazine-work-img">${w.photos&&w.photos[0]?`<img src="${w.photos[0]}" alt="${w.title}">`:'<div class="card-img-placeholder">N</div>'}</div><div class="magazine-work-body"><div class="magazine-work-title">${w.title}</div><div class="magazine-work-meta">${w.name} · ${w.socials||'соцсети не указаны'}</div><button class="magazine-like-btn" onclick="likeMagazineWork('${w.id}')" ${closed?'disabled style="opacity:.4;box-shadow:none"':''}>${liked?'♥':'♡'} ${w.likes||0}</button></div>`; wrap.appendChild(card); });
+  return wrap;
+}
+async function addMagazineWorkPhotos(input){ magazineWorkPhotos=[]; for(const f of Array.from(input.files)){ magazineWorkPhotos.push(await compressImage(f, 900, .65)); } const n=document.getElementById('mag-work-files-note'); if(n) n.textContent=`Выбрано фото: ${magazineWorkPhotos.length}`; input.value=''; }
+function submitMagazineWork(e){ e.preventDefault(); if(!magazineWorkPhotos.length){ showToast('Добавьте фотографии'); return; } magazineWorks.push({id:'mw_'+Date.now(), name:document.getElementById('mag-name').value.trim(), socials:document.getElementById('mag-socials').value.trim(), tg:document.getElementById('mag-tg').value.trim(), title:document.getElementById('mag-work-title').value.trim(), photos:[...magazineWorkPhotos], likes:0, created_at:new Date().toISOString()}); saveToCache('magazine_works', magazineWorks); magazineWorkPhotos=[]; showToast('Работа отправлена'); renderSite(); }
+function likeMagazineWork(id){ if(localStorage.getItem('neva_mag_like_'+id)==='true'){ showToast('Вы уже голосовали за эту работу'); return; } const w=magazineWorks.find(x=>x.id===id); if(!w) return; w.likes=(w.likes||0)+1; localStorage.setItem('neva_mag_like_'+id,'true'); saveToCache('magazine_works', magazineWorks); renderSite(); }
 
 function formatLabel(name){
   const w = name.split(' ');
@@ -2985,12 +3165,12 @@ function resetCheckoutFormUI() {
 function openCheckout(){
   document.getElementById('cart-drawer').classList.remove('open');
   activePromo = null;
-  
+
   if (getSetting('text_checkout_enabled') === 'true') {
     handleTechWorkCheckout();
     return;
   }
-  
+
   resetCheckoutFormUI();
   ['co-name','co-contact','co-city','co-address','co-zip','co-comment','co-promo'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('co-promo-msg').textContent='';
@@ -3074,13 +3254,13 @@ function handleTechWorkCheckout(custName = '', custContact = '', custCity = '', 
     <p style="font-size:0.7rem; line-height:1.6; margin-bottom:20px; opacity:0.6;">
       Нажмите на кнопку ниже, перейдите в поддержку Telegram и отправьте скопированное сообщение в чат:
     </p>
-    
+
     <textarea class="co-input" style="min-height:100px; font-size:0.65rem; margin-bottom:20px; background:var(--bg2);" readonly>${clipboardText}</textarea>
-    
+
     <a href="https://t.me/NEVASTICKERBURG" target="_blank" class="co-submit" style="display:block; text-align:center; padding:18px; text-decoration:none; margin-bottom:10px;" onclick="closeCheckout()">
       НАПИСАТЬ В TELEGRAM (https://t.me/NEVASTICKERBURG) →
     </a>
-    
+
     <button class="admin-btn secondary" style="width:100%; font-size:0.65rem;" onclick="copyToClipboard('${clipboardText.replace(/\n/g, '\\n')}'); showToast('Скопировано повторно!');">
       Скопировать текст повторно
     </button>
@@ -3096,7 +3276,7 @@ async function submitOrder(){
   const address = document.getElementById('co-address') ? document.getElementById('co-address').value.trim() : '';
   const zip = document.getElementById('co-zip') ? document.getElementById('co-zip').value.trim() : '';
   const comment = document.getElementById('co-comment') ? document.getElementById('co-comment').value.trim() : '';
-  
+
   handleTechWorkCheckout(name, contact, city, address, zip, comment);
 }
 
@@ -3241,6 +3421,7 @@ function openAdmin(){
   adminTicketBgs = storedBgs;
   renderAdminTicketBgs();
   updateTechWorkUI();
+  loadMagazineAdminUI();
 }
 function closeAdmin(){ document.getElementById('admin-modal').classList.remove('open'); }
 
@@ -3280,14 +3461,14 @@ function renderAdminProducts(){
 
 async function deleteProduct(id){
   if(!confirm('Вы уверены, что хотите удалить этот товар?')) return;
-  
+
   // Удаляем товар из локального массива
   products = products.filter(p => String(p.id) !== String(id));
-  
+
   // Фиксируем время недавней локальной правки
   localStorage.setItem('neva_last_local_edit', Date.now());
   saveToCache('products', products);
-  
+
   // Перерисовываем интерфейс
   renderSite();
   renderAdminProducts();
@@ -3317,10 +3498,10 @@ function openProductForm(id) {
   document.getElementById('pf-badge').value = p ? p.badge || '' : '';
   document.getElementById('pf-new-size').value = '';
   populateSectionSel(p ? p.section_id || '' : '');
-  
-  renderPfPhotos(); 
+
+  renderPfPhotos();
   renderPfSizes();
-  
+
   document.getElementById('product-form').style.display = 'block';
   document.getElementById('product-form').scrollIntoView({behavior: 'smooth'});
 }
@@ -3385,7 +3566,7 @@ function renderPfPhotos() {
     w.innerHTML = `<img src="${img}" alt=""><button class="admin-photo-del" data-idx="${idx}">✕</button>`;
     g.appendChild(w);
   });
-  
+
   g.onclick = (e) => {
     const b = e.target.closest('[data-idx]');
     if (b) {
@@ -3587,6 +3768,43 @@ async function saveDesignSettings() {
   await setSetting('ticket_bgs', JSON.stringify(adminTicketBgs));
   showToast('Настройки сохранены');
   renderSite();
+}
+
+
+async function setMagazineMode(mode){
+  document.getElementById('mag-mode').value = mode;
+  await saveMagazineSettings();
+}
+function loadMagazineAdminUI(){
+  const ids = ['mag-title','mag-desc','mag-mode','mag-upload-days','mag-vote-days','mag-bg-data','mag-hide-tickets','mag-hide-merch'];
+  if(!document.getElementById('mag-title')) return;
+  document.getElementById('mag-title').value = getSetting('mag_title','Конкурс работ в новый выпуск журнала');
+  document.getElementById('mag-desc').value = getSetting('mag_desc','Загружай свои работы для отбора в новый выпуск NEVASTICK Magazine или голосуй за авторов, которых хочешь увидеть на страницах.');
+  document.getElementById('mag-mode').value = getSetting('mag_mode','upload');
+  document.getElementById('mag-upload-days').value = getSetting('mag_upload_days','14');
+  document.getElementById('mag-vote-days').value = getSetting('mag_vote_days','7');
+  const bg = getSetting('mag_bg','');
+  document.getElementById('mag-bg-data').value = bg;
+  const prev = document.getElementById('mag-bg-prev');
+  if(bg){ prev.src = bg; prev.style.display = 'block'; } else { prev.style.display = 'none'; }
+  document.getElementById('mag-hide-tickets').checked = getSetting('mag_hide_tickets') === 'true';
+  document.getElementById('mag-hide-merch').checked = getSetting('mag_hide_merch') === 'true';
+}
+async function saveMagazineSettings(){
+  const mode = document.getElementById('mag-mode').value;
+  const uploadDays = Math.max(0, parseInt(document.getElementById('mag-upload-days').value) || 0);
+  const voteDays = Math.max(0, parseInt(document.getElementById('mag-vote-days').value) || 0);
+  await setSetting('mag_title', document.getElementById('mag-title').value.trim() || 'Конкурс работ в новый выпуск журнала');
+  await setSetting('mag_desc', document.getElementById('mag-desc').value.trim() || 'Загружай работы и голосуй за авторов NEVASTICK Magazine.');
+  await setSetting('mag_mode', mode);
+  await setSetting('mag_upload_days', String(uploadDays));
+  await setSetting('mag_vote_days', String(voteDays));
+  await setSetting('mag_upload_deadline', String(Date.now() + uploadDays * 86400000));
+  await setSetting('mag_vote_deadline', String(Date.now() + voteDays * 86400000));
+  await setSetting('mag_bg', document.getElementById('mag-bg-data').value || '');
+  await setSetting('mag_hide_tickets', document.getElementById('mag-hide-tickets').checked ? 'true' : 'false');
+  await setSetting('mag_hide_merch', document.getElementById('mag-hide-merch').checked ? 'true' : 'false');
+  applySettings(); renderSite(); showToast('Настройки журнала сохранены');
 }
 
 function resetAll(){
