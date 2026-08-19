@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nevastick Merch Store</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; }
+
+/* ===== HEADER ===== */
+.header { background: #111; border-bottom: 1px solid #222; padding: 15px 20px; position: sticky; top: 0; z-index: 100; }
+.header-inner { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px; }
+.logo { font-size: 24px; font-weight: bold; color: #ff2d55; text-decoration: none; }
+.logo-sub { font-size: 12px; color: #888; margin-top: 2px; }
+.nav { display: flex; gap: 10px; flex-wrap: wrap; }
+.nav a { color: #ccc; text-decoration: none; padding: 8px 14px; border-radius: 6px; transition: 0.2s; font-size: 14px; }
+.nav a:hover, .nav a.active { background: #ff2d55; color: #fff; }
+.header-actions { display: flex; gap: 10px; align-items: center; }
+.cart-btn, .admin-btn, .orders-btn { background: #222; border: 1px solid #333; color: #fff; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; transition: 0.2s; }
+.cart-btn:hover, .admin-btn:hover, .orders-btn:hover { background: #333; }
+.cart-count { background: #ff2d55; border-radius: 50%; padding: 2px 7px; font-size: 11px; margin-left: 5px; }
+
+/* ===== MAIN ===== */
+.main { max-width: 1400px; margin: 0 auto; padding: 30px 20px; }
+.section-title { font-size: 28px; margin-bottom: 20px; font-weight: 700; }
+.section-subtitle { color: #888; margin-bottom: 30px; font-size: 14px; }
+
+/* ===== PRODUCTS GRID ===== */
+.products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+.product-card { background: #151515; border: 1px solid #222; border-radius: 12px; overflow: hidden; transition: 0.3s; cursor: pointer; }
+.product-card:hover { transform: translateY(-4px); border-color: #ff2d55; }
+.product-img { width: 100%; height: 300px; object-fit: cover; background: #1a1a1a; }
+.product-info { padding: 15px; }
+.product-name { font-size: 16px; font-weight: 600; margin-bottom: 5px; }
+.product-price { color: #ff2d55; font-size: 18px; font-weight: 700; }
+.product-badge { position: absolute; top: 10px; left: 10px; background: #ff2d55; color: #fff; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+.product-card { position: relative; }
+.product-sizes { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
+.size-tag { background: #222; padding: 3px 8px; border-radius: 4px; font-size: 11px; color: #aaa; }
+
+/* ===== CONTEST SECTION ===== */
+#contest-section { display: none; }
+.contest-preview { position: relative; min-height: 500px; display: flex; align-items: center; justify-content: center; background-size: cover; background-position: center; border-radius: 16px; overflow: hidden; margin-bottom: 30px; }
+.contest-preview::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.6); }
+.contest-preview-content { position: relative; z-index: 1; text-align: center; padding: 40px; max-width: 600px; }
+.contest-preview-title { font-size: 42px; font-weight: 800; margin-bottom: 15px; background: linear-gradient(135deg, #ff2d55, #ff6b8a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.contest-preview-desc { font-size: 16px; color: #ccc; margin-bottom: 30px; line-height: 1.6; }
+.contest-cta-btn { background: linear-gradient(135deg, #ff2d55, #ff6b8a); color: #fff; border: none; padding: 16px 40px; border-radius: 30px; font-size: 18px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+.contest-cta-btn:hover { transform: scale(1.05); box-shadow: 0 10px 30px rgba(255,45,85,0.4); }
+
+/* Timer */
+.timer-block { background: #151515; border: 1px solid #222; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 25px; }
+.timer-label { color: #888; font-size: 13px; margin-bottom: 8px; }
+.timer-value { font-size: 32px; font-weight: 700; color: #ff2d55; font-variant-numeric: tabular-nums; }
+
+/* Submission Form */
+.submission-form { background: #151515; border: 1px solid #222; border-radius: 12px; padding: 30px; max-width: 600px; margin: 0 auto; }
+.form-group { margin-bottom: 20px; }
+.form-label { display: block; margin-bottom: 8px; font-size: 14px; color: #aaa; }
+.form-input, .form-textarea { width: 100%; background: #0a0a0a; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 8px; font-size: 14px; font-family: inherit; }
+.form-input:focus, .form-textarea:focus { outline: none; border-color: #ff2d55; }
+.form-textarea { min-height: 100px; resize: vertical; }
+.file-upload { border: 2px dashed #333; border-radius: 8px; padding: 30px; text-align: center; cursor: pointer; transition: 0.2s; }
+.file-upload:hover { border-color: #ff2d55; }
+.file-upload input { display: none; }
+.file-upload-text { color: #888; font-size: 14px; }
+.submit-btn { width: 100%; background: #ff2d55; color: #fff; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+.submit-btn:hover { background: #e0264a; }
+.submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Gallery */
+.gallery-controls { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+.search-input { flex: 1; min-width: 200px; background: #151515; border: 1px solid #333; color: #fff; padding: 10px 15px; border-radius: 8px; font-size: 14px; }
+.search-input:focus { outline: none; border-color: #ff2d55; }
+.sort-select { background: #151515; border: 1px solid #333; color: #fff; padding: 10px 15px; border-radius: 8px; font-size: 14px; cursor: pointer; }
+.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+.work-card { background: #151515; border: 1px solid #222; border-radius: 12px; overflow: hidden; transition: 0.3s; }
+.work-card:hover { border-color: #ff2d55; }
+.work-img { width: 100%; height: 250px; object-fit: cover; cursor: pointer; }
+.work-info { padding: 15px; }
+.work-title { font-size: 16px; font-weight: 600; margin-bottom: 5px; }
+.work-author { color: #888; font-size: 13px; margin-bottom: 10px; }
+.work-desc { color: #aaa; font-size: 13px; margin-bottom: 12px; line-height: 1.5; }
+.work-actions { display: flex; justify-content: space-between; align-items: center; }
+.like-btn { background: #222; border: none; color: #fff; padding: 8px 16px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 14px; transition: 0.2s; }
+.like-btn:hover { background: #333; }
+.like-btn.liked { background: #ff2d55; }
+.like-btn .heart { font-size: 16px; }
+.like-count { font-weight: 600; }
+.work-link { color: #ff2d55; text-decoration: none; font-size: 13px; }
+.work-link:hover { text-decoration: underline; }
+
+/* Results */
+.results-block { text-align: center; padding: 60px 20px; }
+.results-title { font-size: 36px; margin-bottom: 20px; }
+.results-text { color: #aaa; font-size: 16px; margin-bottom: 30px; }
+.tg-link { display: inline-block; background: #0088cc; color: #fff; padding: 14px 30px; border-radius: 30px; text-decoration: none; font-size: 16px; font-weight: 600; transition: 0.2s; }
+.tg-link:hover { background: #0077b3; }
+
+/* ===== MODALS ===== */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
+.modal-overlay.active { display: flex; }
+.modal { background: #151515; border: 1px solid #222; border-radius: 16px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; }
+.modal-header { padding: 20px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
+.modal-title { font-size: 20px; font-weight: 700; }
+.modal-close { background: none; border: none; color: #888; font-size: 24px; cursor: pointer; }
+.modal-close:hover { color: #fff; }
+.modal-body { padding: 20px; }
+
+/* ===== ADMIN PANEL ===== */
+.admin-tabs { display: flex; gap: 5px; border-bottom: 1px solid #222; padding: 0 20px; overflow-x: auto; }
+.admin-tab { padding: 12px 16px; background: none; border: none; color: #888; cursor: pointer; font-size: 14px; border-bottom: 2px solid transparent; white-space: nowrap; }
+.admin-tab.active { color: #ff2d55; border-bottom-color: #ff2d55; }
+.admin-content { padding: 20px; }
+.admin-section { display: none; }
+.admin-section.active { display: block; }
+.admin-row { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; align-items: end; }
+.admin-field { flex: 1; min-width: 200px; }
+.admin-field label { display: block; margin-bottom: 6px; font-size: 13px; color: #888; }
+.admin-field input, .admin-field select, .admin-field textarea { width: 100%; background: #0a0a0a; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 6px; font-size: 14px; }
+.admin-btn-primary { background: #ff2d55; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+.admin-btn-primary:hover { background: #e0264a; }
+.admin-btn-secondary { background: #333; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+.toggle-switch { position: relative; width: 50px; height: 26px; background: #333; border-radius: 13px; cursor: pointer; transition: 0.3s; }
+.toggle-switch.active { background: #ff2d55; }
+.toggle-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; background: #fff; border-radius: 50%; transition: 0.3s; }
+.toggle-switch.active::after { left: 27px; }
+
+/* Work moderation list */
+.moderation-list { display: flex; flex-direction: column; gap: 10px; }
+.moderation-item { background: #0a0a0a; border: 1px solid #222; border-radius: 8px; padding: 15px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+.moderation-item img { width: 80px; height: 80px; object-fit: cover; border-radius: 6px; }
+.moderation-info { flex: 1; min-width: 200px; }
+.moderation-info h4 { font-size: 14px; margin-bottom: 4px; }
+.moderation-info p { font-size: 12px; color: #888; }
+.moderation-actions { display: flex; gap: 8px; }
+.btn-approve { background: #28a745; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+.btn-reject { background: #dc3545; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+
+/* ===== CART ===== */
+.cart-items { display: flex; flex-direction: column; gap: 15px; }
+.cart-item { display: flex; gap: 15px; align-items: center; background: #0a0a0a; padding: 15px; border-radius: 8px; }
+.cart-item img { width: 80px; height: 80px; object-fit: cover; border-radius: 6px; }
+.cart-item-info { flex: 1; }
+.cart-item-name { font-size: 14px; margin-bottom: 4px; }
+.cart-item-price { color: #ff2d55; font-weight: 600; }
+.cart-item-remove { background: #333; border: none; color: #fff; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; }
+.cart-total { border-top: 1px solid #222; padding-top: 15px; margin-top: 15px; display: flex; justify-content: space-between; font-size: 18px; font-weight: 700; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .header-inner { flex-direction: column; align-items: flex-start; }
+  .nav { width: 100%; overflow-x: auto; }
+  .contest-preview-title { font-size: 28px; }
+  .gallery-grid { grid-template-columns: 1fr; }
+  .products-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+}
+
+/* ===== NOTIFICATIONS ===== */
+.notification { position: fixed; top: 20px; right: 20px; background: #151515; border: 1px solid #ff2d55; color: #fff; padding: 15px 20px; border-radius: 8px; z-index: 2000; transform: translateX(400px); transition: 0.3s; max-width: 350px; }
+.notification.show { transform: translateX(0); }
+.notification.success { border-color: #28a745; }
+.notification.error { border-color: #dc3545; }
+
+/* Hidden utility */
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div>
+      <a href="#" class="logo" onclick="showHome()">NEVASTICK</a>
+      <div class="logo-sub" id="header-subtitle">Merch Store</div>
+    </div>
+    <nav class="nav">
+      <a href="#" class="active" onclick="showHome()" id="nav-home">Товары</a>
+      <a href="#" onclick="showContest()" id="nav-contest">🎨 Конкурс</a>
+    </nav>
+    <div class="header-actions">
+      <button class="orders-btn" onclick="openModal('orders-modal')">Мои заказы</button>
+      <button class="cart-btn" onclick="openModal('cart-modal')">🛒 Корзина <span class="cart-count" id="cart-count">0</span></button>
+      <button class="admin-btn" onclick="openModal('admin-login-modal')">⚙️ Admin</button>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+  <!-- HOME / PRODUCTS -->
+  <div id="home-section">
+    <div id="tech-works-banner" class="hidden" style="background:#ff9500;color:#000;padding:15px;border-radius:8px;margin-bottom:20px;text-align:center;font-weight:600;">
+      ️ Технические работы. Заказ через Telegram.
+    </div>
+    <h1 class="section-title">Каталог</h1>
+    <div class="products-grid" id="products-grid"></div>
+  </div>
+
+  <!-- CONTEST SECTION -->
+  <div id="contest-section">
+    <h1 class="section-title">🎨 Конкурс работ</h1>
+    
+    <!-- Preview / Landing -->
+    <div id="contest-preview" class="contest-preview">
+      <div class="contest-preview-content">
+        <h2 class="contest-preview-title" id="preview-title">Конкурс работ</h2>
+        <p class="contest-preview-desc" id="preview-desc">Прими участие в конкурсе и попади в новый выпуск журнала!</p>
+        <div class="timer-block" id="preview-timer-block">
+          <div class="timer-label">До окончания подачи работ:</div>
+          <div class="timer-value" id="preview-timer">--:--:--</div>
+        </div>
+        <button class="contest-cta-btn" onclick="openModal('submission-modal')">Подать работу</button>
+      </div>
+    </div>
+
+    <!-- Submission Mode -->
+    <div id="contest-submission-mode" class="hidden">
+      <div class="timer-block">
+        <div class="timer-label">До окончания подачи работ:</div>
+        <div class="timer-value" id="submission-timer">--:--:--</div>
+      </div>
+      <div class="submission-form">
+        <h3 style="margin-bottom:20px;">Подать работу на конкурс</h3>
+        <div class="form-group">
+          <label class="form-label">Ник / Имя *</label>
+          <input type="text" class="form-input" id="work-author" placeholder="Ваш ник или имя">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Соц. сети</label>
+          <input type="text" class="form-input" id="work-social" placeholder="@username или ссылка">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Telegram для связи *</label>
+          <input type="text" class="form-input" id="work-tg" placeholder="@username">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Название работы или серии работ *</label>
+          <input type="text" class="form-input" id="work-title" placeholder="Название">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Описание</label>
+          <textarea class="form-textarea" id="work-description" placeholder="Расскажите о работе"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Пригласительная ссылка (опционально)</label>
+          <input type="text" class="form-input" id="work-invite" placeholder="https://...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Фотографии работ *</label>
+          <label class="file-upload">
+            <input type="file" id="work-images" multiple accept="image/*">
+            <div class="file-upload-text">📷 Нажмите для выбора фото</div>
+          </label>
+          <div id="image-preview-list" style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;"></div>
+        </div>
+        <button class="submit-btn" onclick="submitWork()">Отправить на модерацию</button>
+      </div>
+    </div>
+
+    <!-- Voting Mode -->
+    <div id="contest-voting-mode" class="hidden">
+      <div class="timer-block">
+        <div class="timer-label">До окончания голосования:</div>
+        <div class="timer-value" id="voting-timer">--:--:--</div>
+      </div>
+      <div class="gallery-controls">
+        <input type="text" class="search-input" id="gallery-search" placeholder="🔍 Поиск по названию или автору..." oninput="renderGallery()">
+        <select class="sort-select" id="gallery-sort" onchange="renderGallery()">
+          <option value="likes">По лайкам ↓</option>
+          <option value="date">По дате ↓</option>
+          <option value="name">По названию А-Я</option>
+        </select>
+      </div>
+      <div class="gallery-grid" id="gallery-grid"></div>
+    </div>
+
+    <!-- Results Mode -->
+    <div id="contest-results-mode" class="hidden">
+      <div class="results-block">
+        <h2 class="results-title"> Голосование завершено!</h2>
+        <p class="results-text">Следите за результатами конкурса у нас в канале</p>
+        <a href="https://t.me/nevasticker" target="_blank" class="tg-link">📢 Перейти в Telegram канал</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ===== MODALS ===== -->
+
+<!-- Cart Modal -->
+<div class="modal-overlay" id="cart-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🛒 Корзина</div>
+      <button class="modal-close" onclick="closeModal('cart-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="cart-items" id="cart-items"></div>
+      <div class="cart-total" id="cart-total-block">
+        <span>Итого:</span>
+        <span id="cart-total">0 ₽</span>
+      </div>
+      <button class="submit-btn" style="margin-top:15px;" onclick="openCheckout()">Оформить заказ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Checkout Modal -->
+<div class="modal-overlay" id="checkout-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Оформление заказа</div>
+      <button class="modal-close" onclick="closeModal('checkout-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Имя *</label>
+        <input type="text" class="form-input" id="checkout-name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Telegram / Телефон *</label>
+        <input type="text" class="form-input" id="checkout-contact">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Город</label>
+        <input type="text" class="form-input" id="checkout-city">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Адрес ПВЗ СДЭК</label>
+        <input type="text" class="form-input" id="checkout-address">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Индекс</label>
+        <input type="text" class="form-input" id="checkout-index">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Промокод</label>
+        <div style="display:flex;gap:8px;">
+          <input type="text" class="form-input" id="checkout-promo" style="flex:1;">
+          <button class="admin-btn-secondary" onclick="applyPromo()">Применить</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Комментарий</label>
+        <textarea class="form-textarea" id="checkout-comment"></textarea>
+      </div>
+      <button class="submit-btn" onclick="confirmOrder()">Подтвердить заказ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Orders Modal -->
+<div class="modal-overlay" id="orders-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Мои заказы</div>
+      <button class="modal-close" onclick="closeModal('orders-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="color:#888;margin-bottom:15px;">История с этого устройства:</p>
+      <div id="orders-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Login Modal -->
+<div class="modal-overlay" id="admin-login-modal">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header">
+      <div class="modal-title">Admin Access</div>
+      <button class="modal-close" onclick="closeModal('admin-login-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Введите пароль</label>
+        <input type="password" class="form-input" id="admin-password">
+      </div>
+      <button class="submit-btn" onclick="adminLogin()">Войти</button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Panel Modal -->
+<div class="modal-overlay" id="admin-modal">
+  <div class="modal" style="max-width:900px;">
+    <div class="modal-header">
+      <div class="modal-title">️ Admin Panel — Nevastick Merch Store</div>
+      <button class="modal-close" onclick="closeModal('admin-modal')">✕</button>
+    </div>
+    <div class="admin-tabs">
+      <button class="admin-tab active" onclick="switchAdminTab('tab-github', this)">GitHub</button>
+      <button class="admin-tab" onclick="switchAdminTab('tab-products', this)">Товары</button>
+      <button class="admin-tab" onclick="switchAdminTab('tab-orders', this)">Заказы</button>
+      <button class="admin-tab" onclick="switchAdminTab('tab-promo', this)">Промокоды</button>
+      <button class="admin-tab" onclick="switchAdminTab('tab-design', this)">Дизайн</button>
+      <button class="admin-tab" onclick="switchAdminTab('tab-contest', this)">🎨 Конкурс</button>
+    </div>
+    <div class="admin-content">
+      
+      <!-- GitHub Tab -->
+      <div class="admin-section active" id="tab-github">
+        <h3 style="margin-bottom:15px;">️ Настройки GitHub API</h3>
+        <p style="color:#888;margin-bottom:20px;font-size:14px;">Укажите ваш логин, репозиторий и токен, чтобы админка сохраняла товары прямо на GitHub.</p>
+        <div class="admin-row">
+          <div class="admin-field">
+            <label>GitHub Логин (Owner)</label>
+            <input type="text" id="gh-owner">
+          </div>
+          <div class="admin-field">
+            <label>Репозиторий (Repo)</label>
+            <input type="text" id="gh-repo">
+          </div>
+          <div class="admin-field">
+            <label>GitHub Personal Token (ghp_...)</label>
+            <input type="password" id="gh-token">
+          </div>
+        </div>
+        <button class="admin-btn-primary" onclick="saveGitHubSettings()">Сохранить настройки GitHub</button>
+      </div>
+
+      <!-- Products Tab -->
+      <div class="admin-section" id="tab-products">
+        <h3 style="margin-bottom:15px;">Список товаров</h3>
+        <button class="admin-btn-primary" style="margin-bottom:20px;" onclick="openProductEditor()">+ Добавить товар</button>
+        <div id="admin-products-list"></div>
+      </div>
+
+      <!-- Orders Tab -->
+      <div class="admin-section" id="tab-orders">
+        <h3 style="margin-bottom:15px;">Заказы покупателей</h3>
+        <div id="admin-orders-list"></div>
+      </div>
+
+      <!-- Promo Tab -->
+      <div class="admin-section" id="tab-promo">
+        <h3 style="margin-bottom:15px;">Промокоды</h3>
+        <div class="admin-row">
+          <div class="admin-field">
+            <label>Код</label>
+            <input type="text" id="new-promo-code">
+          </div>
+          <div class="admin-field">
+            <label>Скидка (%)</label>
+            <input type="number" id="new-promo-discount" min="0" max="100">
+          </div>
+          <button class="admin-btn-primary" onclick="addPromo()">Добавить промокод</button>
+        </div>
+        <div id="promo-list" style="margin-top:20px;"></div>
+      </div>
+
+      <!-- Design Tab -->
+      <div class="admin-section" id="tab-design">
+        <h3 style="margin-bottom:15px;">Дизайн</h3>
+        <div class="admin-row">
+          <div class="admin-field">
+            <label>Подзаголовок шапки</label>
+            <input type="text" id="design-subtitle">
+          </div>
+        </div>
+        <div class="admin-row">
+          <div class="admin-field">
+            <label>Режим приёма заказов</label>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:5px;">
+              <div class="toggle-switch" id="tech-works-toggle" onclick="toggleTechWorks()"></div>
+              <span style="font-size:13px;color:#888;">Технические работы (Заказ через Telegram)</span>
+            </div>
+          </div>
+        </div>
+        <div class="admin-row">
+          <div class="admin-field">
+            <label>Фон шапки</label>
+            <input type="file" id="header-bg" accept="image/*">
+          </div>
+        </div>
+        <button class="admin-btn-primary" onclick="saveDesign()">Сохранить все настройки</button>
+        <hr style="border-color:#222;margin:30px 0;">
+        <h4 style="color:#dc3545;margin-bottom:10px;">Опасная зона</h4>
+        <button class="admin-btn-secondary" style="background:#dc3545;" onclick="resetAllData()">Сбросить все данные</button>
+      </div>
+
+      <!-- CONTEST TAB -->
+      <div class="admin-section" id="tab-contest">
+        <h3 style="margin-bottom:15px;">🎨 Управление конкурсом</h3>
+        
+        <div style="background:#0a0a0a;padding:20px;border-radius:8px;margin-bottom:20px;">
+          <h4 style="margin-bottom:15px;">Режим конкурса</h4>
+          <div class="admin-row">
+            <div class="admin-field">
+              <label>Текущий режим</label>
+              <select id="contest-mode" onchange="updateContestMode()">
+                <option value="preview">Превью (лендинг)</option>
+                <option value="submission">Приём работ</option>
+                <option value="voting">Голосование</option>
+                <option value="results">Результаты</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:#0a0a0a;padding:20px;border-radius:8px;margin-bottom:20px;">
+          <h4 style="margin-bottom:15px;">Таймеры</h4>
+          <div class="admin-row">
+            <div class="admin-field">
+              <label>Дата окончания подачи работ</label>
+              <input type="datetime-local" id="contest-submission-deadline">
+            </div>
+            <div class="admin-field">
+              <label>Дата окончания голосования</label>
+              <input type="datetime-local" id="contest-voting-deadline">
+            </div>
+          </div>
+        </div>
+
+        <div style="background:#0a0a0a;padding:20px;border-radius:8px;margin-bottom:20px;">
+          <h4 style="margin-bottom:15px;">Превью страница (лендинг)</h4>
+          <div class="admin-row">
+            <div class="admin-field">
+              <label>Название</label>
+              <input type="text" id="contest-preview-title">
+            </div>
+          </div>
+          <div class="admin-row">
+            <div class="admin-field">
+              <label>Описание</label>
+              <textarea class="form-textarea" id="contest-preview-desc"></textarea>
+            </div>
+          </div>
+          <div class="admin-row">
+            <div class="admin-field">
+              <label>Фоновое изображение</label>
+              <input type="file" id="contest-preview-bg" accept="image/*">
+            </div>
+          </div>
+        </div>
+
+        <div style="background:#0a0a0a;padding:20px;border-radius:8px;margin-bottom:20px;">
+          <h4 style="margin-bottom:15px;">Блоки на главной</h4>
+          <div class="admin-row">
+            <div class="admin-field">
+              <label style="display:flex;align-items:center;gap:10px;">
+                <div class="toggle-switch" id="toggle-tickets" onclick="this.classList.toggle('active')"></div>
+                Показать блок билетов
+              </label>
+            </div>
+            <div class="admin-field">
+              <label style="display:flex;align-items:center;gap:10px;">
+                <div class="toggle-switch" id="toggle-merch" onclick="this.classList.toggle('active')"></div>
+                Показать блок мерча
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:#0a0a0a;padding:20px;border-radius:8px;margin-bottom:20px;">
+          <h4 style="margin-bottom:15px;">Модерация работ (<span id="pending-count">0</span> на рассмотрении)</h4>
+          <div class="moderation-list" id="moderation-list"></div>
+        </div>
+
+        <div style="background:#0a0a0a;padding:20px;border-radius:8px;margin-bottom:20px;">
+          <h4 style="margin-bottom:15px;">Одобренные работы (<span id="approved-count">0</span>)</h4>
+          <div id="approved-works-list"></div>
+        </div>
+
+        <button class="admin-btn-primary" onclick="saveContestSettings()">💾 Сохранить настройки конкурса</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Product Editor Modal -->
+<div class="modal-overlay" id="product-editor-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="product-editor-title">Новый товар</div>
+      <button class="modal-close" onclick="closeModal('product-editor-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="admin-row">
+        <div class="admin-field">
+          <label>Название</label>
+          <input type="text" id="prod-name">
+        </div>
+        <div class="admin-field">
+          <label>Цена (₽)</label>
+          <input type="number" id="prod-price">
+        </div>
+      </div>
+      <div class="admin-row">
+        <div class="admin-field">
+          <label>Категория</label>
+          <input type="text" id="prod-cat">
+        </div>
+        <div class="admin-field">
+          <label>Бейдж (NEW, HIT...)</label>
+          <input type="text" id="prod-badge">
+        </div>
+      </div>
+      <div class="admin-row">
+        <div class="admin-field">
+          <label>Описание</label>
+          <textarea class="form-textarea" id="prod-desc"></textarea>
+        </div>
+      </div>
+      <div class="admin-row">
+        <div class="admin-field">
+          <label>Размеры и количество (формат: XL:4, L:7)</label>
+          <input type="text" id="prod-sizes" placeholder="XL:4, L:7, M:10">
+        </div>
+      </div>
+      <div class="admin-row">
+        <div class="admin-field">
+          <label>Фотографии</label>
+          <input type="file" id="prod-images" multiple accept="image/*">
+        </div>
+      </div>
+      <button class="admin-btn-primary" onclick="saveProduct()">Сохранить товар</button>
+    </div>
+  </div>
+</div>
+
+<!-- Work Detail Modal -->
+<div class="modal-overlay" id="work-detail-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="work-detail-title">Работа</div>
+      <button class="modal-close" onclick="closeModal('work-detail-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="work-detail-body"></div>
+  </div>
+</div>
+
+<!-- NOTIFICATION -->
+<div class="notification" id="notification"></div>
+
+<script>
+// ===== STATE =====
+let state = {
+  products: [],
+  cart: [],
+  orders: [],
+  promos: [],
+  github: { owner: '', repo: '', token: '' },
+  design: { subtitle: 'Merch Store', techWorks: false, headerBg: '' },
+  contest: {
+    mode: 'preview',
+    submissionDeadline: '',
+    votingDeadline: '',
+    previewTitle: 'Конкурс работ',
+    previewDescription: 'Прими участие в конкурсе и попади в новый выпуск журнала!',
+    previewBackground: '',
+    showTickets: true,
+    showMerch: true,
+    works: []
+  }
+};
+
+let isAdmin = false;
+let currentEditingProduct = null;
+let uploadedWorkImages = [];
+
+// ===== INIT =====
+async function init() {
+  loadState();
+  await loadProductsFromJSON();
+  renderProducts();
+  renderCart();
+  renderOrders();
+  renderPromos();
+  applyDesign();
+  renderContest();
+  startTimers();
+}
+
+function loadState() {
+  const saved = localStorage.getItem('nevastick_state');
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      state = { ...state, ...parsed };
+    } catch(e) {}
+  }
+}
+
+function saveState() {
+  localStorage.setItem('nevastick_state', JSON.stringify(state));
+}
+
+async function loadProductsFromJSON() {
+  try {
+    const res = await fetch('products.json');
+    if (res.ok) {
+      const data = await res.json();
+      if (data.products && data.products.length > 0) {
+        state.products = data.products;
+      }
+      if (data.contest) {
+        state.contest = { ...state.contest, ...data.contest };
+      }
+    }
+  } catch(e) {
+    console.log('products.json not found or invalid');
+  }
+}
+
+// ===== NAVIGATION =====
+function showHome() {
+  document.getElementById('home-section').style.display = 'block';
+  document.getElementById('contest-section').style.display = 'none';
+  document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
+  document.getElementById('nav-home').classList.add('active');
+}
+
+function showContest() {
+  document.getElementById('home-section').style.display = 'none';
+  document.getElementById('contest-section').style.display = 'block';
+  document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
+  document.getElementById('nav-contest').classList.add('active');
+  renderContest();
+}
+
+// ===== PRODUCTS =====
+function renderProducts() {
+  const grid = document.getElementById('products-grid');
+  grid.innerHTML = state.products.map(p => `
+    <div class="product-card" onclick="addToCart('${p.id}')">
+      ${p.badge ? `<div class="product-badge">${p.badge}</div>` : ''}
+      <img class="product-img" src="${p.imgs && p.imgs[0] ? p.imgs[0] : ''}" alt="${p.name}" onerror="this.style.background='#222'">
+      <div class="product-info">
+        <div class="product-name">${p.name}</div>
+        <div class="product-price">${p.price} ₽</div>
+        <div class="product-sizes">
+          ${p.sizes ? Object.keys(p.sizes).map(s => `<span class="size-tag">${s}: ${p.sizes[s]}</span>`).join('') : ''}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== CART =====
+function addToCart(productId) {
+  const product = state.products.find(p => p.id === productId);
+  if (!product) return;
+  const existing = state.cart.find(c => c.id === productId);
+  if (existing) {
+    existing.qty++;
+  } else {
+    state.cart.push({ ...product, qty: 1 });
+  }
+  saveState();
+  renderCart();
+  showNotification('Товар добавлен в корзину', 'success');
+}
+
+function removeFromCart(productId) {
+  state.cart = state.cart.filter(c => c.id !== productId);
+  saveState();
+  renderCart();
+}
+
+function renderCart() {
+  const items = document.getElementById('cart-items');
+  const count = document.getElementById('cart-count');
+  const total = document.getElementById('cart-total');
+  
+  count.textContent = state.cart.reduce((s, c) => s + c.qty, 0);
+  
+  if (state.cart.length === 0) {
+    items.innerHTML = '<p style="color:#888;text-align:center;padding:20px;">Корзина пуста</p>';
+    total.textContent = '0 ₽';
+    return;
+  }
+  
+  items.innerHTML = state.cart.map(c => `
+    <div class="cart-item">
+      <img src="${c.imgs && c.imgs[0] ? c.imgs[0] : ''}" alt="${c.name}">
+      <div class="cart-item-info">
+        <div class="cart-item-name">${c.name}</div>
+        <div class="cart-item-price">${c.price} ₽ × ${c.qty} = ${c.price * c.qty} ₽</div>
+      </div>
+      <button class="cart-item-remove" onclick="removeFromCart('${c.id}')">✕</button>
+    </div>
+  `).join('');
+  
+  const sum = state.cart.reduce((s, c) => s + c.price * c.qty, 0);
+  total.textContent = sum + ' ₽';
+}
+
+function openCheckout() {
+  if (state.cart.length === 0) {
+    showNotification('Корзина пуста', 'error');
+    return;
+  }
+  closeModal('cart-modal');
+  openModal('checkout-modal');
+}
+
+function confirmOrder() {
+  const name = document.getElementById('checkout-name').value.trim();
+  const contact = document.getElementById('checkout-contact').value.trim();
+  if (!name || !contact) {
+    showNotification('Заполните обязательные поля', 'error');
+    return;
+  }
+  
+  const order = {
+    id: 'ord_' + Date.now(),
+    date: new Date().toISOString(),
+    name, contact,
+    city: document.getElementById('checkout-city').value,
+    address: document.getElementById('checkout-address').value,
+    index: document.getElementById('checkout-index').value,
+    comment: document.getElementById('checkout-comment').value,
+    items: [...state.cart],
+    total: state.cart.reduce((s, c) => s + c.price * c.qty, 0)
+  };
+  
+  state.orders.push(order);
+  state.cart = [];
+  saveState();
+  renderCart();
+  renderOrders();
+  closeModal('checkout-modal');
+  showNotification('Заказ оформлен! Мы свяжемся с вами.', 'success');
+}
+
+// ===== ORDERS =====
+function renderOrders() {
+  const list = document.getElementById('orders-list');
+  if (state.orders.length === 0) {
+    list.innerHTML = '<p style="color:#888;">Нет заказов</p>';
+    return;
+  }
+  list.innerHTML = state.orders.map(o => `
+    <div style="background:#0a0a0a;padding:15px;border-radius:8px;margin-bottom:10px;">
+      <div style="font-weight:600;margin-bottom:5px;">Заказ #${o.id.slice(-6)}</div>
+      <div style="color:#888;font-size:13px;">${new Date(o.date).toLocaleString('ru-RU')}</div>
+      <div style="margin-top:8px;">${o.items.map(i => `${i.name} × ${i.qty}`).join(', ')}</div>
+      <div style="color:#ff2d55;font-weight:600;margin-top:8px;">${o.total} ₽</div>
+    </div>
+  `).join('');
+}
+
+// ===== PROMOS =====
+function addPromo() {
+  const code = document.getElementById('new-promo-code').value.trim().toUpperCase();
+  const discount = parseInt(document.getElementById('new-promo-discount').value);
+  if (!code || !discount) {
+    showNotification('Заполните код и скидку', 'error');
+    return;
+  }
+  state.promos.push({ code, discount });
+  saveState();
+  renderPromos();
+  document.getElementById('new-promo-code').value = '';
+  document.getElementById('new-promo-discount').value = '';
+  showNotification('Промокод добавлен', 'success');
+}
+
+function renderPromos() {
+  const list = document.getElementById('promo-list');
+  if (!list) return;
+  list.innerHTML = state.promos.map((p, i) => `
+    <div style="background:#0a0a0a;padding:10px;border-radius:6px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+      <span><b>${p.code}</b> — ${p.discount}%</span>
+      <button class="btn-reject" onclick="removePromo(${i})">Удалить</button>
+    </div>
+  `).join('');
+}
+
+function removePromo(i) {
+  state.promos.splice(i, 1);
+  saveState();
+  renderPromos();
+}
+
+function applyPromo() {
+  const code = document.getElementById('checkout-promo').value.trim().toUpperCase();
+  const promo = state.promos.find(p => p.code === code);
+  if (promo) {
+    showNotification(`Промокод применён: скидка ${promo.discount}%`, 'success');
+  } else {
+    showNotification('Промокод не найден', 'error');
+  }
+}
+
+// ===== DESIGN =====
+function applyDesign() {
+  document.getElementById('header-subtitle').textContent = state.design.subtitle || 'Merch Store';
+  const banner = document.getElementById('tech-works-banner');
+  if (state.design.techWorks) {
+    banner.classList.remove('hidden');
+  } else {
+    banner.classList.add('hidden');
+  }
+  if (state.design.headerBg) {
+    document.querySelector('.header').style.backgroundImage = `url(${state.design.headerBg})`;
+    document.querySelector('.header').style.backgroundSize = 'cover';
+  }
+}
+
+function toggleTechWorks() {
+  state.design.techWorks = !state.design.techWorks;
+  document.getElementById('tech-works-toggle').classList.toggle('active');
+  applyDesign();
+  saveState();
+}
+
+function saveDesign() {
+  state.design.subtitle = document.getElementById('design-subtitle').value || 'Merch Store';
+  const bgFile = document.getElementById('header-bg').files[0];
+  if (bgFile) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      state.design.headerBg = e.target.result;
+      saveState();
+      applyDesign();
+      showNotification('Дизайн сохранён', 'success');
+    };
+    reader.readAsDataURL(bgFile);
+  } else {
+    saveState();
+    applyDesign();
+    showNotification('Дизайн сохранён', 'success');
+  }
+}
+
+// ===== ADMIN =====
+function adminLogin() {
+  const pass = document.getElementById('admin-password').value;
+  if (pass === 'admin123') {
+    isAdmin = true;
+    closeModal('admin-login-modal');
+    openModal('admin-modal');
+    loadAdminData();
+    showNotification('Добро пожаловать, админ!', 'success');
+  } else {
+    showNotification('Неверный пароль', 'error');
+  }
+}
+
+function loadAdminData() {
+  document.getElementById('gh-owner').value = state.github.owner || '';
+  document.getElementById('gh-repo').value = state.github.repo || '';
+  document.getElementById('gh-token').value = state.github.token || '';
+  document.getElementById('design-subtitle').value = state.design.subtitle || '';
+  if (state.design.techWorks) document.getElementById('tech-works-toggle').classList.add('active');
+  
+  // Contest
+  document.getElementById('contest-mode').value = state.contest.mode || 'preview';
+  document.getElementById('contest-submission-deadline').value = state.contest.submissionDeadline || '';
+  document.getElementById('contest-voting-deadline').value = state.contest.votingDeadline || '';
+  document.getElementById('contest-preview-title').value = state.contest.previewTitle || '';
+  document.getElementById('contest-preview-desc').value = state.contest.previewDescription || '';
+  if (state.contest.showTickets) document.getElementById('toggle-tickets').classList.add('active');
+  if (state.contest.showMerch) document.getElementById('toggle-merch').classList.add('active');
+  
+  renderAdminProducts();
+  renderAdminOrders();
+  renderModeration();
+}
+
+function switchAdminTab(tabId, btn) {
+  document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  btn.classList.add('active');
+}
+
+function saveGitHubSettings() {
+  state.github.owner = document.getElementById('gh-owner').value;
+  state.github.repo = document.getElementById('gh-repo').value;
+  state.github.token = document.getElementById('gh-token').value;
+  saveState();
+  showNotification('GitHub настройки сохранены', 'success');
+}
+
+function renderAdminProducts() {
+  const list = document.getElementById('admin-products-list');
+  list.innerHTML = state.products.map(p => `
+    <div style="background:#0a0a0a;padding:12px;border-radius:6px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <b>${p.name}</b> — ${p.price} ₽
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="admin-btn-secondary" onclick="editProduct('${p.id}')">✏️</button>
+        <button class="btn-reject" onclick="deleteProduct('${p.id}')">🗑</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openProductEditor() {
+  currentEditingProduct = null;
+  document.getElementById('product-editor-title').textContent = 'Новый товар';
+  document.getElementById('prod-name').value = '';
+  document.getElementById('prod-price').value = '';
+  document.getElementById('prod-cat').value = '';
+  document.getElementById('prod-badge').value = '';
+  document.getElementById('prod-desc').value = '';
+  document.getElementById('prod-sizes').value = '';
+  openModal('product-editor-modal');
+}
+
+function editProduct(id) {
+  const p = state.products.find(x => x.id === id);
+  if (!p) return;
+  currentEditingProduct = p;
+  document.getElementById('product-editor-title').textContent = 'Редактировать товар';
+  document.getElementById('prod-name').value = p.name || '';
+  document.getElementById('prod-price').value = p.price || '';
+  document.getElementById('prod-cat').value = p.cat || '';
+  document.getElementById('prod-badge').value = p.badge || '';
+  document.getElementById('prod-desc').value = p.desc || '';
+  const sizesStr = p.sizes ? Object.entries(p.sizes).map(([k,v]) => `${k}:${v}`).join(', ') : '';
+  document.getElementById('prod-sizes').value = sizesStr;
+  openModal('product-editor-modal');
+}
+
+function saveProduct() {
+  const name = document.getElementById('prod-name').value.trim();
+  const price = parseInt(document.getElementById('prod-price').value);
+  if (!name || !price) {
+    showNotification('Заполните название и цену', 'error');
+    return;
+  }
+  
+  const sizesStr = document.getElementById('prod-sizes').value;
+  const sizes = {};
+  if (sizesStr) {
+    sizesStr.split(',').forEach(s => {
+      const [k, v] = s.trim().split(':');
+      if (k && v) sizes[k.trim()] = parseInt(v.trim());
+    });
+  }
+  
+  const handleImages = (imgs) => {
+    const product = {
+      id: currentEditingProduct ? currentEditingProduct.id : 'p_' + Date.now(),
+      name, price,
+      cat: document.getElementById('prod-cat').value,
+      badge: document.getElementById('prod-badge').value,
+      desc: document.getElementById('prod-desc').value,
+      description: document.getElementById('prod-desc').value,
+      sizes,
+      imgs: imgs.length > 0 ? imgs : (currentEditingProduct ? currentEditingProduct.imgs : [])
+    };
+    
+    if (currentEditingProduct) {
+      const idx = state.products.findIndex(p => p.id === currentEditingProduct.id);
+      if (idx >= 0) state.products[idx] = product;
+    } else {
+      state.products.push(product);
+    }
+    
+    saveState();
+    renderProducts();
+    renderAdminProducts();
+    closeModal('product-editor-modal');
+    showNotification('Товар сохранён', 'success');
+  };
+  
+  const files = document.getElementById('prod-images').files;
+  if (files.length > 0) {
+    const readers = Array.from(files).map(f => new Promise(res => {
+      const r = new FileReader();
+      r.onload = e => res(e.target.result);
+      r.readAsDataURL(f);
+    }));
+    Promise.all(readers).then(handleImages);
+  } else {
+    handleImages([]);
+  }
+}
+
+function deleteProduct(id) {
+  if (!confirm('Удалить товар?')) return;
+  state.products = state.products.filter(p => p.id !== id);
+  saveState();
+  renderProducts();
+  renderAdminProducts();
+}
+
+function renderAdminOrders() {
+  const list = document.getElementById('admin-orders-list');
+  if (state.orders.length === 0) {
+    list.innerHTML = '<p style="color:#888;">Нет заказов</p>';
+    return;
+  }
+  list.innerHTML = state.orders.map(o => `
+    <div style="background:#0a0a0a;padding:15px;border-radius:8px;margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+        <b>#${o.id.slice(-6)}</b>
+        <span style="color:#888;font-size:13px;">${new Date(o.date).toLocaleString('ru-RU')}</span>
+      </div>
+      <div><b>${o.name}</b> — ${o.contact}</div>
+      <div style="color:#888;font-size:13px;">${o.city} ${o.address} ${o.index}</div>
+      <div style="margin-top:8px;">${o.items.map(i => `${i.name} × ${i.qty}`).join(', ')}</div>
+      <div style="color:#ff2d55;font-weight:600;margin-top:8px;">${o.total} ₽</div>
+      ${o.comment ? `<div style="color:#888;font-size:13px;margin-top:5px;">💬 ${o.comment}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+function resetAllData() {
+  if (!confirm('Вы уверены? Все данные будут удалены!')) return;
+  localStorage.removeItem('nevastick_state');
+  location.reload();
+}
+
+// ===== CONTEST =====
+function renderContest() {
+  const c = state.contest;
+  const now = new Date();
+  
+  // Apply preview settings
+  document.getElementById('preview-title').textContent = c.previewTitle || 'Конкурс работ';
+  document.getElementById('preview-desc').textContent = c.previewDescription || '';
+  const previewEl = document.getElementById('contest-preview');
+  if (c.previewBackground) {
+    previewEl.style.backgroundImage = `url(${c.previewBackground})`;
+  }
+  
+  // Hide all modes
+  document.getElementById('contest-preview').classList.add('hidden');
+  document.getElementById('contest-submission-mode').classList.add('hidden');
+  document.getElementById('contest-voting-mode').classList.add('hidden');
+  document.getElementById('contest-results-mode').classList.add('hidden');
+  
+  const mode = c.mode;
+  
+  if (mode === 'preview') {
+    document.getElementById('contest-preview').classList.remove('hidden');
+  } else if (mode === 'submission') {
+    document.getElementById('contest-submission-mode').classList.remove('hidden');
+  } else if (mode === 'voting') {
+    document.getElementById('contest-voting-mode').classList.remove('hidden');
+    renderGallery();
+  } else if (mode === 'results') {
+    document.getElementById('contest-results-mode').classList.remove('hidden');
+  }
+}
+
+function startTimers() {
+  setInterval(() => {
+    const c = state.contest;
+    const now = new Date();
+    
+    if (c.submissionDeadline) {
+      const subEnd = new Date(c.submissionDeadline);
+      const subDiff = subEnd - now;
+      const subText = subDiff > 0 ? formatTime(subDiff) : 'Завершено';
+      const el1 = document.getElementById('preview-timer');
+      const el2 = document.getElementById('submission-timer');
+      if (el1) el1.textContent = subText;
+      if (el2) el2.textContent = subText;
+    }
+    
+    if (c.votingDeadline) {
+      const voteEnd = new Date(c.votingDeadline);
+      const voteDiff = voteEnd - now;
+      const voteText = voteDiff > 0 ? formatTime(voteDiff) : 'Завершено';
+      const el = document.getElementById('voting-timer');
+      if (el) el.textContent = voteText;
+    }
+  }, 1000);
+}
+
+function formatTime(ms) {
+  const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const mins = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+  const secs = Math.floor((ms % (1000 * 60)) / 1000);
+  if (days > 0) return `${days}д ${hours}ч ${mins}м`;
+  return `${String(hours).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+}
+
+// Image upload for work
+document.addEventListener('DOMContentLoaded', () => {
+  const imgInput = document.getElementById('work-images');
+  if (imgInput) {
+    imgInput.addEventListener('change', (e) => {
+      uploadedWorkImages = [];
+      const files = Array.from(e.target.files);
+      const readers = files.map(f => new Promise(res => {
+        const r = new FileReader();
+        r.onload = ev => res(ev.target.result);
+        r.readAsDataURL(f);
+      }));
+      Promise.all(readers).then(imgs => {
+        uploadedWorkImages = imgs;
+        document.getElementById('image-preview-list').innerHTML = imgs.map((img, i) => 
+          `<img src="${img}" style="width:80px;height:80px;object-fit:cover;border-radius:6px;">`
+        ).join('');
+      });
+    });
+  }
+});
+
+function submitWork() {
+  const author = document.getElementById('work-author').value.trim();
+  const tg = document.getElementById('work-tg').value.trim();
+  const title = document.getElementById('work-title').value.trim();
+  
+  if (!author || !tg || !title) {
+    showNotification('Заполните обязательные поля', 'error');
+    return;
+  }
+  if (uploadedWorkImages.length === 0) {
+    showNotification('Загрузите хотя бы одно фото', 'error');
+    return;
+  }
+  
+  const work = {
+    id: 'w_' + Date.now(),
+    title,
+    description: document.getElementById('work-description').value.trim(),
+    author,
+    social: document.getElementById('work-social').value.trim(),
+    telegram: tg,
+    inviteLink: document.getElementById('work-invite').value.trim(),
+    images: uploadedWorkImages,
+    likes: 0,
+    likedBy: [],
+    approved: false,
+    createdAt: new Date().toISOString()
+  };
+  
+  state.contest.works.push(work);
+  saveState();
+  
+  // Reset form
+  document.getElementById('work-author').value = '';
+  document.getElementById('work-social').value = '';
+  document.getElementById('work-tg').value = '';
+  document.getElementById('work-title').value = '';
+  document.getElementById('work-description').value = '';
+  document.getElementById('work-invite').value = '';
+  document.getElementById('work-images').value = '';
+  uploadedWorkImages = [];
+  document.getElementById('image-preview-list').innerHTML = '';
+  
+  closeModal('submission-modal');
+  showNotification('Работа отправлена на модерацию!', 'success');
+}
+
+function renderGallery() {
+  const grid = document.getElementById('gallery-grid');
+  const search = (document.getElementById('gallery-search').value || '').toLowerCase();
+  const sort = document.getElementById('gallery-sort').value;
+  
+  let works = state.contest.works.filter(w => w.approved);
+  
+  if (search) {
+    works = works.filter(w => 
+      w.title.toLowerCase().includes(search) || 
+      w.author.toLowerCase().includes(search)
+    );
+  }
+  
+  if (sort === 'likes') {
+    works.sort((a, b) => b.likes - a.likes);
+  } else if (sort === 'date') {
+    works.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  } else if (sort === 'name') {
+    works.sort((a, b) => a.title.localeCompare(b.title));
+  }
+  
+  const userLikes = getUserLikes();
+  
+  if (works.length === 0) {
+    grid.innerHTML = '<p style="color:#888;text-align:center;padding:40px;grid-column:1/-1;">Пока нет работ. Будьте первым!</p>';
+    return;
+  }
+  
+  grid.innerHTML = works.map(w => {
+    const isLiked = userLikes.includes(w.id);
+    return `
+    <div class="work-card">
+      <img class="work-img" src="${w.images[0]}" alt="${w.title}" onclick="openWorkDetail('${w.id}')">
+      <div class="work-info">
+        <div class="work-title">${w.title}</div>
+        <div class="work-author"> ${w.author}${w.social ? ' • ' + w.social : ''}</div>
+        <div class="work-desc">${w.description || ''}</div>
+        <div class="work-actions">
+          <button class="like-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike('${w.id}')">
+            <span class="heart">${isLiked ? '❤️' : '🤍'}</span>
+            <span class="like-count">${w.likes}</span>
+          </button>
+          ${w.inviteLink ? `<a href="${w.inviteLink}" target="_blank" class="work-link">🔗 Ссылка автора</a>` : ''}
+        </div>
+      </div>
+    </div>
+  `}).join('');
+}
+
+function getUserLikes() {
+  try {
+    return JSON.parse(localStorage.getItem('user_likes') || '[]');
+  } catch { return []; }
+}
+
+function setUserLikes(likes) {
+  localStorage.setItem('user_likes', JSON.stringify(likes));
+}
+
+function toggleLike(workId) {
+  const work = state.contest.works.find(w => w.id === workId);
+  if (!work || !work.approved) return;
+  
+  let userLikes = getUserLikes();
+  const idx = userLikes.indexOf(workId);
+  
+  if (idx >= 0) {
+    // Remove like
+    userLikes.splice(idx, 1);
+    work.likes = Math.max(0, work.likes - 1);
+  } else {
+    // Add like
+    userLikes.push(workId);
+    work.likes++;
+  }
+  
+  setUserLikes(userLikes);
+  saveState();
+  renderGallery();
+}
+
+function openWorkDetail(workId) {
+  const work = state.contest.works.find(w => w.id === workId);
+  if (!work) return;
+  
+  document.getElementById('work-detail-title').textContent = work.title;
+  document.getElementById('work-detail-body').innerHTML = `
+    <div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:10px;">
+      ${work.images.map(img => `<img src="${img}" style="max-height:400px;border-radius:8px;">`).join('')}
+    </div>
+    <div style="margin-top:15px;">
+      <h3>${work.title}</h3>
+      <p style="color:#888;margin:5px 0;">👤 ${work.author}${work.social ? ' • ' + work.social : ''}</p>
+      <p style="color:#888;margin:5px 0;">📱 ${work.telegram}</p>
+      <p style="margin-top:10px;line-height:1.6;">${work.description || 'Описание не указано'}</p>
+      ${work.inviteLink ? `<a href="${work.inviteLink}" target="_blank" style="color:#ff2d55;margin-top:10px;display:inline-block;">🔗 Перейти к работе автора</a>` : ''}
+    </div>
+  `;
+  openModal('work-detail-modal');
+}
+
+// Moderation
+function renderModeration() {
+  const pending = state.contest.works.filter(w => !w.approved);
+  const approved = state.contest.works.filter(w => w.approved);
+  
+  document.getElementById('pending-count').textContent = pending.length;
+  document.getElementById('approved-count').textContent = approved.length;
+  
+  const modList = document.getElementById('moderation-list');
+  if (pending.length === 0) {
+    modList.innerHTML = '<p style="color:#888;">Нет работ на модерации</p>';
+  } else {
+    modList.innerHTML = pending.map(w => `
+      <div class="moderation-item">
+        <img src="${w.images[0]}" alt="${w.title}">
+        <div class="moderation-info">
+          <h4>${w.title}</h4>
+          <p> ${w.author} • 📱 ${w.telegram}</p>
+          <p>${w.description || ''}</p>
+        </div>
+        <div class="moderation-actions">
+          <button class="btn-approve" onclick="approveWork('${w.id}')">✓ Одобрить</button>
+          <button class="btn-reject" onclick="rejectWork('${w.id}')"> Отклонить</button>
+        </div>
+      </div>
+    `).join('');
+  }
+  
+  const appList = document.getElementById('approved-works-list');
+  if (approved.length === 0) {
+    appList.innerHTML = '<p style="color:#888;">Нет одобренных работ</p>';
+  } else {
+    appList.innerHTML = approved.map(w => `
+      <div class="moderation-item">
+        <img src="${w.images[0]}" alt="${w.title}">
+        <div class="moderation-info">
+          <h4>${w.title} — ${w.likes} ❤️</h4>
+          <p>👤 ${w.author}</p>
+        </div>
+        <div class="moderation-actions">
+          <button class="btn-reject" onclick="unapproveWork('${w.id}')">Снять с публикации</button>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+function approveWork(id) {
+  const w = state.contest.works.find(x => x.id === id);
+  if (w) { w.approved = true; saveState(); renderModeration(); showNotification('Работа одобрена', 'success'); }
+}
+
+function rejectWork(id) {
+  if (!confirm('Отклонить работу?')) return;
+  state.contest.works = state.contest.works.filter(w => w.id !== id);
+  saveState();
+  renderModeration();
+  showNotification('Работа отклонена', 'success');
+}
+
+function unapproveWork(id) {
+  const w = state.contest.works.find(x => x.id === id);
+  if (w) { w.approved = false; saveState(); renderModeration(); }
+}
+
+function updateContestMode() {
+  const mode = document.getElementById('contest-mode').value;
+  state.contest.mode = mode;
+  saveState();
+  renderContest();
+  showNotification('Режим изменён: ' + mode, 'success');
+}
+
+function saveContestSettings() {
+  state.contest.mode = document.getElementById('contest-mode').value;
+  state.contest.submissionDeadline = document.getElementById('contest-submission-deadline').value;
+  state.contest.votingDeadline = document.getElementById('contest-voting-deadline').value;
+  state.contest.previewTitle = document.getElementById('contest-preview-title').value;
+  state.contest.previewDescription = document.getElementById('contest-preview-desc').value;
+  state.contest.showTickets = document.getElementById('toggle-tickets').classList.contains('active');
+  state.contest.showMerch = document.getElementById('toggle-merch').classList.contains('active');
+  
+  const bgFile = document.getElementById('contest-preview-bg').files[0];
+  if (bgFile) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      state.contest.previewBackground = e.target.result;
+      saveState();
+      renderContest();
+      showNotification('Настройки конкурса сохранены', 'success');
+    };
+    reader.readAsDataURL(bgFile);
+  } else {
+    saveState();
+    renderContest();
+    showNotification('Настройки конкурса сохранены', 'success');
+  }
+}
+
+// ===== MODALS =====
+function openModal(id) {
+  document.getElementById(id).classList.add('active');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.classList.remove('active');
+  });
+});
+
+// ===== NOTIFICATIONS =====
+function showNotification(msg, type = '') {
+  const n = document.getElementById('notification');
+  n.textContent = msg;
+  n.className = 'notification show ' + type;
+  setTimeout(() => n.classList.remove('show'), 3000);
+}
+
+// ===== SUBMISSION MODAL (dynamic) =====
+// Add submission modal to DOM
+const submissionModalHTML = `
+<div class="modal-overlay" id="submission-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📤 Подать работу</div>
+      <button class="modal-close" onclick="closeModal('submission-modal')"></button>
+    </div>
+    <div class="modal-body">
+      <div class="timer-block" style="margin-bottom:20px;">
+        <div class="timer-label">До окончания подачи:</div>
+        <div class="timer-value" id="modal-submission-timer">--:--:--</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ник / Имя *</label>
+        <input type="text" class="form-input" id="m-work-author">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Соц. сети</label>
+        <input type="text" class="form-input" id="m-work-social">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Telegram для связи *</label>
+        <input type="text" class="form-input" id="m-work-tg">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Название работы *</label>
+        <input type="text" class="form-input" id="m-work-title">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Описание</label>
+        <textarea class="form-textarea" id="m-work-description"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Пригласительная ссылка</label>
+        <input type="text" class="form-input" id="m-work-invite">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Фотографии *</label>
+        <label class="file-upload">
+          <input type="file" id="m-work-images" multiple accept="image/*">
+          <div class="file-upload-text"> Нажмите для выбора фото</div>
+        </label>
+        <div id="m-image-preview-list" style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;"></div>
+      </div>
+      <button class="submit-btn" onclick="submitWorkFromModal()">Отправить на модерацию</button>
+    </div>
+  </div>
+</div>
+`;
+document.body.insertAdjacentHTML('beforeend', submissionModalHTML);
+
+let modalUploadedImages = [];
+document.getElementById('m-work-images').addEventListener('change', (e) => {
+  modalUploadedImages = [];
+  const files = Array.from(e.target.files);
+  const readers = files.map(f => new Promise(res => {
+    const r = new FileReader();
+    r.onload = ev => res(ev.target.result);
+    r.readAsDataURL(f);
+  }));
+  Promise.all(readers).then(imgs => {
+    modalUploadedImages = imgs;
+    document.getElementById('m-image-preview-list').innerHTML = imgs.map(img => 
+      `<img src="${img}" style="width:80px;height:80px;object-fit:cover;border-radius:6px;">`
+    ).join('');
+  });
+});
+
+function submitWorkFromModal() {
+  const author = document.getElementById('m-work-author').value.trim();
+  const tg = document.getElementById('m-work-tg').value.trim();
+  const title = document.getElementById('m-work-title').value.trim();
+  
+  if (!author || !tg || !title) {
+    showNotification('Заполните обязательные поля', 'error');
+    return;
+  }
+  if (modalUploadedImages.length === 0) {
+    showNotification('Загрузите хотя бы одно фото', 'error');
+    return;
+  }
+  
+  const work = {
+    id: 'w_' + Date.now(),
+    title,
+    description: document.getElementById('m-work-description').value.trim(),
+    author,
+    social: document.getElementById('m-work-social').value.trim(),
+    telegram: tg,
+    inviteLink: document.getElementById('m-work-invite').value.trim(),
+    images: modalUploadedImages,
+    likes: 0,
+    likedBy: [],
+    approved: false,
+    createdAt: new Date().toISOString()
+  };
+  
+  state.contest.works.push(work);
+  saveState();
+  
+  document.getElementById('m-work-author').value = '';
+  document.getElementById('m-work-social').value = '';
+  document.getElementById('m-work-tg').value = '';
+  document.getElementById('m-work-title').value = '';
+  document.getElementById('m-work-description').value = '';
+  document.getElementById('m-work-invite').value = '';
+  document.getElementById('m-work-images').value = '';
+  modalUploadedImages = [];
+  document.getElementById('m-image-preview-list').innerHTML = '';
+  
+  closeModal('submission-modal');
+  showNotification('Работа отправлена на модерацию!', 'success');
+}
+
+// Timer for modal
+setInterval(() => {
+  const c = state.contest;
+  if (c.submissionDeadline) {
+    const subEnd = new Date(c.submissionDeadline);
+    const subDiff = subEnd - new Date();
+    const el = document.getElementById('modal-submission-timer');
+    if (el) el.textContent = subDiff > 0 ? formatTime(subDiff) : 'Завершено';
+  }
+}, 1000);
+
+// Start
+init();
+</script>
+</body>
+</html>
