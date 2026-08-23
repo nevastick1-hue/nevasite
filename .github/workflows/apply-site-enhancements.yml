@@ -16,16 +16,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Ensure enhancement script is loaded
+      - name: Ensure enhancement scripts are loaded
         run: |
           python - <<'PY'
           from pathlib import Path
           p = Path('index.html')
           text = p.read_text(encoding='utf-8')
-          tag = '<script src="site-enhancements.js"></script>'
-          if tag not in text:
-              text = text.replace('</body>', f'{tag}\n</body>')
-              p.write_text(text, encoding='utf-8')
+          tags = [
+              '<script src="site-enhancements.js"></script>',
+              '<script src="site-persistence.js"></script>'
+          ]
+          for tag in tags:
+              if tag not in text:
+                  text = text.replace('</body>', f'{tag}\n</body>')
+          p.write_text(text, encoding='utf-8')
           PY
 
       - name: Provide background-logo fallback
@@ -38,5 +42,5 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html backlogo.svg
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m 'Wire site enhancement layer'
+          git commit -m 'Wire site persistence layer'
           git push
