@@ -16,9 +16,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Ensure enhancement scripts are loaded
+      - name: Ensure enhancement scripts and shared data are loaded
         run: |
           python - <<'PY'
+          import json
           from pathlib import Path
           p = Path('index.html')
           text = p.read_text(encoding='utf-8')
@@ -29,6 +30,23 @@ jobs:
           for tag in tags:
               if tag not in text:
                   text = text.replace('</body>', f'{tag}\n</body>')
+
+          data_path = Path('site-data.json')
+          if data_path.exists():
+              data = json.loads(data_path.read_text(encoding='utf-8'))
+          else:
+              data = {"version":1,"sections":[],"settings":{}}
+          marker_start = '<script id="neva-shared-data">'
+          marker_end = '</script>'
+          start = text.find(marker_start)
+          if start >= 0:
+              end = text.find(marker_end, start)
+              if end >= 0:
+                  end += len(marker_end)
+                  text = text[:start] + text[end:]
+          shared = json.dumps(data, ensure_ascii=False, separators=(',', ':')).replace('</script>', '<\\/script>')
+          tag = f'<script id="neva-shared-data">window.__NEVA_SHARED_DATA__={shared};</script>\n'
+          text = text.replace('</head>', tag + '</head>', 1)
           p.write_text(text, encoding='utf-8')
           PY
 
@@ -42,5 +60,5 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html backlogo.svg
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m 'Wire site persistence layer'
+          git commit -m 'Publish shared site settings to frontend'
           git push
