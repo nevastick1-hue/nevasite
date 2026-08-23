@@ -4,6 +4,7 @@
   let globalData={version:1,sections:null,settings:null};
   let globalLoaded=false;
   let syncing=false;
+  let needsInitialMigration=false;
 
   function gh(){
     return {owner:localStorage.getItem('neva_gh_owner')||'',repo:localStorage.getItem('neva_gh_repo')||'',token:localStorage.getItem('neva_gh_token')||''};
@@ -16,7 +17,17 @@
       const r=await fetch(DATA_URL+'?v='+Date.now(),{cache:'no-store'});
       if(r.ok){
         const d=await r.json();
-        if(d&&typeof d==='object') globalData=Object.assign(globalData,d);
+        if(d&&typeof d==='object'){
+          const emptySeed=!d.updated_at && Array.isArray(d.sections) && d.sections.length===0 && d.settings && Object.keys(d.settings).length===0;
+          if(emptySeed){
+            globalData=Object.assign({},d);
+            const localSections=JSON.parse(localStorage.getItem('neva_sections')||'null');
+            const localSettings=JSON.parse(localStorage.getItem('neva_settings')||'null');
+            if(Array.isArray(localSections)&&localSections.length)globalData.sections=localSections;
+            if(localSettings&&typeof localSettings==='object'&&Object.keys(localSettings).length)globalData.settings=localSettings;
+            needsInitialMigration=!!(Array.isArray(globalData.sections)&&globalData.sections.length || globalData.settings&&Object.keys(globalData.settings).length);
+          }else globalData=Object.assign(globalData,d);
+        }
       }
     }catch(e){
       const c=cache(); if(c) globalData=Object.assign(globalData,c);
@@ -30,6 +41,7 @@
       saveToCache('settings',settings);
     }
     saveCache(globalData); globalLoaded=true;
+    if(needsInitialMigration) await pushGlobal('Migrate existing admin data to shared storage');
   }
 
   async function pushGlobal(reason){
